@@ -6,14 +6,14 @@ THIS DOCUMENT IS NOT COMPLETED YET
 * Reversi
 
 ## Commands
-* login
-* logout
-* subscribe
-* challenge
-* move
-* get
-* forfeit
-* help
+* [login](#login)
+* [logout](https://github.com/OthelloAi/OthelloAi/blob/master/PROTOCOL.md#logout)
+* [subscribe]()
+* [challenge]()
+* [move]()
+* [get]()
+* [forfeit]()
+* [help]()
 
 ### Login
 	request:
@@ -21,12 +21,12 @@ THIS DOCUMENT IS NOT COMPLETED YET
 
 successful login
 
-	response: 
+	response:
 	OK
 
 failed login
-	
-	response: 
+
+	response:
 	ERR Duplicate name exists
 
 ### Logout
@@ -36,14 +36,14 @@ failed login
 	quit
 	disconnect
 	bye
-	
+
 	response:
 	none
 
 ### Get
 	request:
 	get <gamelist | playerlist>
-	
+
 	response:
 	<gamelist>:
 	<playerlist>
@@ -53,23 +53,23 @@ failed login
 
 ### Challenge
 Challenge other player
-    
+
     request:
 	challenge "player" "game"
-	 
+
 	response:
 	OK
 
 Other player accepted your challenge
 
 	response:
-	
-	 
+
+
 Accept challenge from other player
-  
+
     request:
 	challenge accept CHALLANGENUMBER
-	 
+
 	response:
 	OK
 	SVR GAME MATCH {PLAYERTOMOVE: "twee", GAMETYPE: "Tic-tac-toe", OPPONENT: "een"}
@@ -78,7 +78,7 @@ Accept challenge from other player
 ### Move
 	request:
 	move integer [1...game type field size]
-	
+
 #### responses:
 ##### made the move yourself
 it is valid and you do not win or lose
@@ -91,15 +91,15 @@ it is valid and you do not win or lose
 	 SVR GAME MOVE {PLAYER: "name", MOVE: "number", DETAILS: ""}
 
 it is NOT valid
-      
+
     request:
     move integer
-      
+
     response:
 
 
 it is valid and you win
-      
+
     request:
     move integer
 
@@ -107,7 +107,7 @@ it is valid and you win
 
 
 it is valid and you lose while there was a previous move from other player
-      
+
     request:
     move integer
 
