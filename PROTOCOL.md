@@ -7,13 +7,13 @@ THIS DOCUMENT IS NOT COMPLETED YET
 
 ## Commands
 * [login](#login)
-* [logout](https://github.com/OthelloAi/OthelloAi/blob/master/PROTOCOL.md#logout)
-* [subscribe]()
-* [challenge]()
-* [move]()
-* [get]()
-* [forfeit]()
-* [help]()
+* [logout](#logout)
+* [subscribe](#subscribe)
+* [challenge](#challenge)
+* [move](#move)
+* [get](#get)
+* [forfeit](#forfeit)
+* [help](#help)
 
 ### Login
 	request:
