@@ -6,6 +6,7 @@ THIS DOCUMENT IS NOT COMPLETED YET
 * Reversi
 
 ## Commands
+* [wrong command](#wrong-command)
 * [login](#login)
 * [logout](#logout)
 * [subscribe](#subscribe)
@@ -14,6 +15,13 @@ THIS DOCUMENT IS NOT COMPLETED YET
 * [get](#get)
 * [forfeit](#forfeit)
 * [help](#help)
+
+### Wrong Command
+	request:
+	<command> <arguments>
+	
+	response:
+	ERR Unknown <command> argument: 'argument'
 
 ### Login
 	request:
@@ -46,7 +54,10 @@ failed login
 
 	response:
 	<gamelist>:
-	<playerlist>
+	SVR GAMELIST ["Reversi", "Tic-tac-toe"]
+	
+	<playerlist>:
+	SVR PLAYERLIST ["Player name one", "" ...]
 
 ### Subscribe
 	subscribe <game> // wait for other player to join match
@@ -74,6 +85,21 @@ Accept challenge from other player
 	OK
 	SVR GAME MATCH {PLAYERTOMOVE: "twee", GAMETYPE: "Tic-tac-toe", OPPONENT: "een"}
 	SVR GAME YOURTURN {TURNMESSAGE: ""} // only if it is your turn
+
+### Forfeit
+	request:
+	forfeit
+	
+Your client response
+
+	response:
+	OK
+	SVR GAME LOSS {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Player forfeited match"}
+
+Other client response
+
+	response:
+	SVR GAME WIN {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Player forfeited match"}
 
 ### Move
 	request:
