@@ -6,7 +6,7 @@ Haal de repo binnen met de SSH Clone URL, als het goed is staan je remotes metee
 goed.
 
 ```bash
-$ git clone git@github.com:OthelloAi/OthelloAi.git
+$ git clone https://github.com/OthelloAi/OthelloAi.git
 ```
 
 Staan je remotes niet goed, dan doe je ook nog:
