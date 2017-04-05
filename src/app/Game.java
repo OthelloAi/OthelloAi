@@ -8,11 +8,15 @@ import javafx.stage.Stage;
 import app.commands.*;
 import app.gui.GUI;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
  * @author Joël Hoekstra
  */
+
+
+
 public class Game extends Application implements Protocol {
     private CommandSender sender;
     private Stage stage;
@@ -21,9 +25,17 @@ public class Game extends Application implements Protocol {
     private Random rand;
     private GUI gui;
     private boolean loggedIn = false;
+    private ArrayList<String> players;
 
     public Game() {
         rand = new Random();
+        players = new ArrayList<>();
+        players.add("een");
+        players.add("twee");
+        players.add("drie");
+        players.add("vier");
+        players.add("vijf");
+        players.add("zes");
     }
 
     public GameType getGameType() {
@@ -33,6 +45,10 @@ public class Game extends Application implements Protocol {
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
         gui.render();
+    }
+
+    public ArrayList<String> getPlayers() {
+        return players;
     }
 
     public Token[][] getBoard() {

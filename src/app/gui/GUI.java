@@ -64,7 +64,7 @@ public class GUI extends BorderPane {
         Button btn = new Button("Challenge");
         btn.setPrefSize(80, 30);
         btn.setOnAction(e -> {
-            ChallengeDialog dialog = new ChallengeDialog();
+            ChallengeDialog dialog = new ChallengeDialog(game);
             Optional<Pair<String, String>> result = dialog.display();
             result.ifPresent(command -> {
                 game.handleCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
