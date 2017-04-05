@@ -14,6 +14,9 @@ import java.util.Random;
 /**
  * @author Joël Hoekstra
  */
+
+
+
 public class Game extends Application implements Protocol {
     private CommandSender sender;
     private Stage stage;
@@ -22,11 +25,19 @@ public class Game extends Application implements Protocol {
     private Random rand;
     private GUI gui;
     private boolean loggedIn = false;
+    private ArrayList<String> players;
 
     private Board board;
 
     public Game() {
         rand = new Random();
+        players = new ArrayList<>();
+        players.add("een");
+        players.add("twee");
+        players.add("drie");
+        players.add("vier");
+        players.add("vijf");
+        players.add("zes");
         board = new Board(gameType);
     }
 
@@ -38,6 +49,10 @@ public class Game extends Application implements Protocol {
         this.gameType = gameType;
         board = new Board(gameType);
         gui.render();
+    }
+
+    public ArrayList<String> getPlayers() {
+        return players;
     }
 
     public Token[][] getBoard() {
