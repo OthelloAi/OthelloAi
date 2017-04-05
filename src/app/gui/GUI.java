@@ -32,11 +32,11 @@ public class GUI extends BorderPane {
 
     public void render() {
         if (game.isLoggedIn()) {
+            System.out.println("board: " + game.getBoard());
             Platform.runLater(() -> {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI)) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     setCenter(gameGUI);
-
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI)) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
@@ -54,7 +54,7 @@ public class GUI extends BorderPane {
                 getSubscribeButton(),
                 getChallengeButton(),
                 getPlayerListButton(),
-                getGameListButton(),
+//                getGameListButton(),
                 getLogoutButton()
         );
         return hBox;
@@ -64,7 +64,7 @@ public class GUI extends BorderPane {
         Button btn = new Button("Challenge");
         btn.setPrefSize(80, 30);
         btn.setOnAction(e -> {
-            ChallengeDialog dialog = new ChallengeDialog();
+            ChallengeDialog dialog = new ChallengeDialog(game);
             Optional<Pair<String, String>> result = dialog.display();
             result.ifPresent(command -> {
                 game.handleCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));

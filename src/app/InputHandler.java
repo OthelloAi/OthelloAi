@@ -43,7 +43,7 @@ public class InputHandler implements Runnable {
 
             if (responseString.startsWith("PLAYERLIST", 4)) {
                 ArrayList<String> params = parseParameters(responseString.substring(14));
-                return new PlayerListResponse(params);
+                return new PlayerListResponse(game, params);
             }
 
             if (responseString.startsWith("GAME MATCH", 4)) {
@@ -57,7 +57,11 @@ public class InputHandler implements Runnable {
             if (responseString.startsWith("GAME YOURTURN", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(19, responseString.length() - 1));
                 // do your move here
-
+                // @todo remove this later because @Martijn has made this.
+                System.out.println("game YOURTURN, params:");
+                for (String key : params.keySet()) {
+                    System.out.println(key + ": " + params.get(key));
+                }
             }
 
             if (responseString.startsWith("GAME CHALLENGE", 4)) {
@@ -71,7 +75,7 @@ public class InputHandler implements Runnable {
 
             if (responseString.startsWith("GAME MOVE", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(15, responseString.length() - 1));
-                System.out.println("game Move, params:");
+                System.out.println("game MOVE, params:");
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
@@ -112,6 +116,10 @@ public class InputHandler implements Runnable {
             String gameName = command.toString().split(" ")[1];
             GameType gameType = Config.getGameTypeFromName(gameName);
             response = new SubscribeResponse(game, new Subscribe(gameType));
+        }
+
+        if (command instanceof LoginCommand) {
+            response = new LoginSuccessResponse(game);
         }
 
         return response;
