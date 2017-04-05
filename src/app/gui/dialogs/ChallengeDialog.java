@@ -1,5 +1,6 @@
 package app.gui.dialogs;
 
+import app.Game;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -14,7 +15,10 @@ import java.util.Optional;
  * @author Joël Hoekstra
  */
 public class ChallengeDialog extends Dialog {
-    public ChallengeDialog() {}
+    private Game game;
+    public ChallengeDialog(Game game) {
+        this.game = game;
+    }
 
     public Optional<Pair<String, String>> display() {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -32,7 +36,6 @@ public class ChallengeDialog extends Dialog {
 
         TextField username = new TextField();
         username.setPromptText("Username");
-
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("Reversi", "Tic-tac-toe");
         comboBox.getSelectionModel().selectFirst();

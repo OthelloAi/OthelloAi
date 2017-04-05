@@ -16,10 +16,6 @@ public class Challenge {
         this.gameType = gameType;
     }
 
-//    public Challenge(int id) {
-//        this.id = id;
-//    }
-
     public boolean accept(boolean accept) {
         this.accepted = accept;
         return accept;

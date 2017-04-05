@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import app.commands.*;
 import app.gui.GUI;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -17,13 +18,16 @@ public class Game extends Application implements Protocol {
     private CommandSender sender;
     private Stage stage;
     private GameType gameType = GameType.TIC_TAC_TOE;
-
+    private ArrayList<Player> playerList;
     private Random rand;
     private GUI gui;
     private boolean loggedIn = false;
 
+    private Board board;
+
     public Game() {
         rand = new Random();
+        board = new Board(gameType);
     }
 
     public GameType getGameType() {
@@ -32,40 +36,16 @@ public class Game extends Application implements Protocol {
 
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
+        board = new Board(gameType);
         gui.render();
     }
 
     public Token[][] getBoard() {
-        Token token;
-        Token[][] board = null;
-        if (gameType == GameType.TIC_TAC_TOE) {
-            board = new Token[3][3];
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    if (rand.nextInt(20) >= 10) {
-                        token = new Token('X');
-                    } else {
-                        token = new Token('O');
-                    }
-                    board[y][x] = token;
-                }
-            }
-        }
+        return board.getBoard();
+    }
 
-        if (gameType == GameType.REVERSI) {
-            board = new Token[8][8];
-            for (int y = 0; y < 8; y++) {
-                for (int x = 0; x < 8; x++) {
-                    if (rand.nextInt(20) >= 10) {
-                        token = new Token('X');
-                    } else {
-                        token = new Token('O');
-                    }
-                    board[y][x] = token;
-                }
-            }
-        }
-        return board;
+    public void setPlayers(ArrayList<Player> playerList) {
+        this.playerList = playerList;
     }
 
     @Override
