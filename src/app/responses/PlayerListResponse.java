@@ -1,5 +1,8 @@
 package app.responses;
 
+import app.Game;
+import app.Player;
+
 import java.util.ArrayList;
 
 /**
@@ -7,16 +10,20 @@ import java.util.ArrayList;
  */
 public class PlayerListResponse implements Response {
     private ArrayList<String> playerList;
+    private Game game;
 
-    public PlayerListResponse(ArrayList<String> playerList) {
+    public PlayerListResponse(Game game, ArrayList<String> playerList) {
+        this.game = game;
         this.playerList = playerList;
     }
 
     @Override
     public void handle() {
-        System.out.println("processing PlayerListResponse");
+        ArrayList<Player> players = new ArrayList<>();
         for (String player : playerList) {
-            System.out.println(player);
+            players.add(new Player(player));
         }
+
+        game.setPlayers(players);
     }
 }

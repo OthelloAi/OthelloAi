@@ -4,10 +4,16 @@ package app;
  * @author Joël Hoekstra
  */
 public class Move {
-    int position;
+    private int position;
+    private Player player;
 
-    public Move(int position) {
+    public Move(int position, Player player) {
         this.position = position;
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public int getPosition() {

@@ -21,11 +21,13 @@ public class Game extends Application implements Protocol {
     private CommandSender sender;
     private Stage stage;
     private GameType gameType = GameType.TIC_TAC_TOE;
-
+    private ArrayList<Player> playerList;
     private Random rand;
     private GUI gui;
     private boolean loggedIn = false;
     private ArrayList<String> players;
+
+    private Board board;
 
     public Game() {
         rand = new Random();
@@ -36,6 +38,7 @@ public class Game extends Application implements Protocol {
         players.add("vier");
         players.add("vijf");
         players.add("zes");
+        board = new Board(gameType);
     }
 
     public GameType getGameType() {
@@ -44,6 +47,7 @@ public class Game extends Application implements Protocol {
 
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
+        board = new Board(gameType);
         gui.render();
     }
 
@@ -52,36 +56,11 @@ public class Game extends Application implements Protocol {
     }
 
     public Token[][] getBoard() {
-        Token token;
-        Token[][] board = null;
-        if (gameType == GameType.TIC_TAC_TOE) {
-            board = new Token[3][3];
-            for (int y = 0; y < 3; y++) {
-                for (int x = 0; x < 3; x++) {
-                    if (rand.nextInt(20) >= 10) {
-                        token = new Token('X');
-                    } else {
-                        token = new Token('O');
-                    }
-                    board[y][x] = token;
-                }
-            }
-        }
+        return board.getBoard();
+    }
 
-        if (gameType == GameType.REVERSI) {
-            board = new Token[8][8];
-            for (int y = 0; y < 8; y++) {
-                for (int x = 0; x < 8; x++) {
-                    if (rand.nextInt(20) >= 10) {
-                        token = new Token('X');
-                    } else {
-                        token = new Token('O');
-                    }
-                    board[y][x] = token;
-                }
-            }
-        }
-        return board;
+    public void setPlayers(ArrayList<Player> playerList) {
+        this.playerList = playerList;
     }
 
     @Override

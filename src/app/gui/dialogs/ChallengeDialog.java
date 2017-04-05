@@ -10,16 +10,14 @@ import java.util.Optional;
 
 /**
  * Got the main idea from :http://code.makery.ch/blog/javafx-dialogs-official/
- * Pair + Optional
  * @author Joël Hoekstra
  */
-public class ChallengeDialog extends Dialog{
+
+public class ChallengeDialog extends Dialog {
     private Game game;
     public ChallengeDialog(Game game) {
         this.game = game;
     }
-
-
 
     public Optional<Pair<String, String>> display() {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
@@ -38,7 +36,6 @@ public class ChallengeDialog extends Dialog{
         ComboBox<String> userbox = new ComboBox<>();
         userbox.getItems().addAll(game.getPlayers());
         userbox.getSelectionModel().selectFirst();
-
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("Reversi", "Tic-tac-toe");
         comboBox.getSelectionModel().selectFirst();

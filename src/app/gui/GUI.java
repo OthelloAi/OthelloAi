@@ -32,11 +32,11 @@ public class GUI extends BorderPane {
 
     public void render() {
         if (game.isLoggedIn()) {
+            System.out.println("board: " + game.getBoard());
             Platform.runLater(() -> {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI)) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     setCenter(gameGUI);
-
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI)) {
                     gameGUI = new TicTacToeGUI(game.getBoard());

@@ -48,7 +48,6 @@ public class CommandSender implements Protocol, Runnable {
             while (running) {
                 if (commands.size() > 0) {
                     Command command = commands.get(0);
-//                    String command = commands.get(0);
                     out.println(command.toString());
                     addSentCommand(command);
                     System.out.println("[CLNT] command: " + command.toString());
