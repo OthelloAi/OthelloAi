@@ -54,7 +54,7 @@ public class GUI extends BorderPane {
                 getSubscribeButton(),
                 getChallengeButton(),
                 getPlayerListButton(),
-                getGameListButton(),
+//                getGameListButton(),
                 getLogoutButton()
         );
         return hBox;

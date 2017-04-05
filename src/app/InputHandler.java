@@ -43,7 +43,7 @@ public class InputHandler implements Runnable {
 
             if (responseString.startsWith("PLAYERLIST", 4)) {
                 ArrayList<String> params = parseParameters(responseString.substring(14));
-                return new PlayerListResponse(params);
+                return new PlayerListResponse(game, params);
             }
 
             if (responseString.startsWith("GAME MATCH", 4)) {

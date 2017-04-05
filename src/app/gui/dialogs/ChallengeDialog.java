@@ -1,11 +1,15 @@
 package app.gui.dialogs;
 
 import app.Game;
+import app.Player;
+import app.commands.PlayerListCommand;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -34,8 +38,14 @@ public class ChallengeDialog extends Dialog {
         grid.setPadding(new Insets(20, 150, 10, 10));
 
         ComboBox<String> userbox = new ComboBox<>();
-        userbox.getItems().addAll(game.getPlayers());
-        userbox.getSelectionModel().selectFirst();
+        ArrayList<Player> playerList = game.getPlayerList();
+
+        if (playerList != null) { // catch an none existing arraylist
+            for (Player player : playerList) {
+                userbox.getItems().add(player.getUsername());
+            }
+            userbox.getSelectionModel().selectFirst();
+        }
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("Reversi", "Tic-tac-toe");
         comboBox.getSelectionModel().selectFirst();
