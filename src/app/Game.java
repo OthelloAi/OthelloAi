@@ -25,7 +25,7 @@ public class Game extends Application implements Protocol {
     private Board board;
     private Player loggedInPlayer;
 
-    private Match match;
+    private Match match = null;
 
     public Game() {
         rand = new Random();
@@ -95,8 +95,11 @@ public class Game extends Application implements Protocol {
 
     public void setLogin(boolean loggedIn) {
         this.loggedIn = loggedIn;
-        gui.update();
-        gui.render();
+        update();
+    }
+
+    public ArrayList<Integer> getPossibleMoves() {
+        return board.getPossibleMoves();
     }
 
 
@@ -138,12 +141,16 @@ public class Game extends Application implements Protocol {
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
-        if (match == null) {
+        System.out.println("your in a new match..");
+//        if (match == null || match.isFinished()) {
             showAlert("You're placed in a match. Good luck!");
+            board = new Board(gameType);
+            gui.reset();
             match = new Match(gameType, playerOne, playerTwo);
-        } else {
-            showAlert("You're already in a match.");
-        }
+//            gui.update();
+//        } else {
+//            showAlert("You're already in a match.");
+//        }
     }
 
     public Move getNextMove() {
@@ -170,5 +177,9 @@ public class Game extends Application implements Protocol {
             }
         }
         return new Token('-');
+    }
+
+    public void update() {
+        gui.update();
     }
 }

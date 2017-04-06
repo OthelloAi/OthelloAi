@@ -4,6 +4,9 @@ import app.*;
 
 import java.util.List;
 
+import app.actors.Actor;
+import app.actors.IterativeActor;
+import app.actors.RandomActor;
 import app.gui.dialogs.MoveDialog;
 import javafx.util.Pair;
 import app.commands.*;
@@ -23,6 +26,7 @@ import app.gui.dialogs.SubscribeDialog;
 public class GUI extends BorderPane {
     private Game game;
     private GameGUI gameGUI;
+    private Actor actor = new RandomActor();
 
     public GUI(Game game) {
         this.game = game;
@@ -30,20 +34,21 @@ public class GUI extends BorderPane {
         render();
     }
 
-
     public void render() {
         if (game.isLoggedIn()) {
             System.out.println("board: " + game.getBoard());
             Platform.runLater(() -> {
-                if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI)) {
+                if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     setCenter(gameGUI);
                 }
-                if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI)) {
+                if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
                     setCenter(gameGUI);
                 }
-                gameGUI.render();
+                if (gameGUI != null) {
+                    gameGUI.render();
+                }
             });
         }
     }
@@ -55,11 +60,22 @@ public class GUI extends BorderPane {
                 getSubscribeButton(),
                 getChallengeButton(),
                 getPlayerListButton(),
-//                getGameListButton(),
                 getMoveButton(),
+                getAiButton(),
                 getLogoutButton()
         );
         return hBox;
+    }
+
+    private Button getAiButton() {
+        Button btn = new Button("AI");
+        btn.setPrefSize(80, 30);
+        btn.setOnAction(e -> {
+            int position = actor.getNext(game.getPossibleMoves());
+            Move move = new Move(position, game.getLoggedInPlayer());
+            game.handleCommand(new MoveCommand(move));
+        });
+        return btn;
     }
 
     private Button getMoveButton() {
@@ -74,6 +90,9 @@ public class GUI extends BorderPane {
                     if (game.isInMatch()) {
                         Move move = new Move(Integer.parseInt(movePosition), game.getLoggedInPlayer());
                         game.handleCommand(new MoveCommand(move));
+                    } else {
+                        // perhaps the reset should happen here.
+                        // or an empty game gui should be rendered.
                     }
                 }
 //                System.out.println("Move: " + move.getPosition() + " - " + move.getPlayer());
@@ -145,13 +164,10 @@ public class GUI extends BorderPane {
         return btn;
     }
 
-    private Button getGameListButton() {
-        Button btn = new Button("games");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> game.handleCommand(new GameListCommand()));
-        return btn;
+    public void reset() {
+        gameGUI = null;
+        update();
     }
-
 
     public void update() {
         // grab everything if something has changed

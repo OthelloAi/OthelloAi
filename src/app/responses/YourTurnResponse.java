@@ -2,6 +2,8 @@ package app.responses;
 
 import app.Game;
 import app.Move;
+import app.actors.Actor;
+import app.actors.IterativeActor;
 import app.commands.MoveCommand;
 
 /**
