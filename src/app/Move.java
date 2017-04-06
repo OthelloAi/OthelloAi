@@ -10,6 +10,7 @@ public class Move {
     public Move(int position, Player player) {
         this.position = position;
         this.player = player;
+        System.out.println("Move: " + position);
     }
 
     public Player getPlayer() {

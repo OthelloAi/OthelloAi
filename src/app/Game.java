@@ -23,6 +23,10 @@ public class Game extends Application implements Protocol {
     private GUI gui;
     private boolean loggedIn = false;
     private Board board;
+    private Player loggedInPlayer;
+
+    private boolean inMatch = false;
+    private Match match;
 
     public Game() {
         rand = new Random();
@@ -37,6 +41,18 @@ public class Game extends Application implements Protocol {
         this.gameType = gameType;
         board = new Board(gameType);
         gui.render();
+    }
+
+    public void setLoggedInPlayer(Player player) {
+        loggedInPlayer = player;
+    }
+
+    public Player getLoggedInPlayer() {
+        return loggedInPlayer;
+    }
+
+    public boolean isInMatch() {
+        return (match != null && match.isStarted() && !match.isFinished());
     }
 
     public ArrayList<Player> getPlayerList() {
@@ -71,7 +87,6 @@ public class Game extends Application implements Protocol {
         stage.close();
     }
 
-
     public void setLogin(boolean loggedIn) {
         this.loggedIn = loggedIn;
         gui.update();
@@ -81,6 +96,7 @@ public class Game extends Application implements Protocol {
     public void showAlert(String message) {
         showAlert(message, "", "");
     }
+
     public void showAlert(String message, String title, String header) {
         Platform.runLater(() -> {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -97,6 +113,38 @@ public class Game extends Application implements Protocol {
     }
 
     public boolean isLoggedIn() {
-        return true; //loggedIn;
+        return (loggedInPlayer != null);
+    }
+
+    public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
+        if (match == null) {
+            match = new Match(gameType, playerOne, playerTwo);
+        }
+    }
+
+    public Move getNextMove() {
+        return new Move(0, getLoggedInPlayer());
+    }
+
+    public void placeMove(Move move) {
+        if (match != null) {
+            match.addMove(move);
+            board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
+            gui.update();
+        }
+    }
+
+    private Token getTokenByPlayer(Player player) {
+        if (match != null) {
+            System.out.println("token for player: " + player.getUsername());
+            if (player.getUsername().equals(match.getPlayerOne().getUsername())) {
+                return new Token('X');
+            }
+
+            if (player.getUsername().equals(match.getPlayerTwo().getUsername())) {
+                return new Token('O');
+            }
+        }
+        return new Token('-');
     }
 }

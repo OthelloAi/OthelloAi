@@ -47,11 +47,13 @@ public class InputHandler implements Runnable {
             }
 
             if (responseString.startsWith("GAME MATCH", 4)) {
-                Map<String, String> params = parseAssocParams(responseString.substring(16));
+                Map<String, String> params = parseAssocParams(responseString.substring(16, responseString.length() - 1));
                 System.out.println("game match, params:");
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
+                // response = SVR GAME MATCH {PLAYERTOMOVE: "username", GAMETYPE: "gameTypeName", OPPONENT: "username"}
+                return new GameMatchResponse(game, params);
             }
 
             if (responseString.startsWith("GAME YOURTURN", 4)) {
@@ -62,6 +64,10 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
+
+                return new YourTurnResponse(game);
+                // response = SVR GAME YOURTURN {TURNMESSAGE: ""}
+//                return new YourTurnResponse();
             }
 
             if (responseString.startsWith("GAME CHALLENGE", 4)) {
@@ -79,6 +85,8 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
+                // SVR GAME MOVE {PLAYER: "username", MOVE: "5", DETAILS: ""}
+                return new ReceiveMoveResponse(game, params);
             }
 
             if (responseString.startsWith("GAME WIN", 4)) {
@@ -87,6 +95,22 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
+                // SVR GAME WIN {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
+                // PLAYERONESCORE
+                // PLAYERTWOSCORE
+                // COMMENT
+            }
+
+            if (responseString.startsWith("GAME DRAW", 4)) {
+                Map<String, String> params = parseAssocParams(responseString.substring(15, responseString.length() - 1));
+                System.out.println("game DRAW, params:");
+                for (String key : params.keySet()) {
+                    System.out.println(key + ": " + params.get(key));
+                }
+                // SVR GAME WIN {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
+                // PLAYERONESCORE
+                // PLAYERTWOSCORE
+                // COMMENT
             }
 
             if (responseString.startsWith("GAME LOSS", 4)) {
@@ -95,6 +119,11 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
+                // response = SVR GAME LOSS {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Player forfeited match"}
+                // PLAYERONESCORE
+                // PLAYERTWOSCORE
+                // COMMENT
+
             }
         } else if (responseString.equals("OK")) {
             Command responseTo = sender.getOldestSentCommand();
@@ -119,7 +148,8 @@ public class InputHandler implements Runnable {
         }
 
         if (command instanceof LoginCommand) {
-            response = new LoginSuccessResponse(game);
+            String username = command.toString().split(" ")[1];
+            response = new LoginSuccessResponse(game, new Player(username));
         }
 
         return response;

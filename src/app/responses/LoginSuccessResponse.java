@@ -1,6 +1,7 @@
 package app.responses;
 
 import app.Game;
+import app.Player;
 
 /**
  * @author Joël Hoekstra
@@ -8,13 +9,16 @@ import app.Game;
 public class LoginSuccessResponse implements Response {
 
     private Game game;
+    private Player player;
 
-    public LoginSuccessResponse(Game game) {
+    public LoginSuccessResponse(Game game, Player player) {
         this.game = game;
+        this.player = player;
     }
 
     @Override
     public void handle() {
         game.setLogin(true);
+        game.setLoggedInPlayer(player);
     }
 }

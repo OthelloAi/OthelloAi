@@ -23,12 +23,13 @@ public class Board {
             board = new Token[3][3];
             for (int y = 0; y < 3; y++) {
                 for (int x = 0; x < 3; x++) {
-                    if (rand.nextInt(20) >= 10) {
-                        token = new Token('X');
-                    } else {
-                        token = new Token('O');
-                    }
-                    board[y][x] = token;
+//                    if (rand.nextInt(20) >= 10) {
+//                        token = new Token('X');
+//                    } else {
+//                        token = new Token('O');
+//                    }
+//                    board[y][x] = token;
+                    board[y][x] = new Token('.');
                 }
             }
         }
@@ -48,10 +49,15 @@ public class Board {
         }
     }
 
-
     public Token[][] getBoard() {
         return board;
     }
 
+    public void addMove(int position, Token token) {
+        int y = position / board.length;
+        int x = position % board.length;
+
+        board[y][x] = token;
+    }
 
 }
