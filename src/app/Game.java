@@ -16,7 +16,7 @@ import java.util.Random;
  */
 public class Game extends Application implements Protocol {
     private CommandSender sender;
-    private Stage stage;
+    private ArrayList<Stage> stages = new ArrayList<>();
     private GameType gameType = GameType.TIC_TAC_TOE;
     private ArrayList<Player> playerList;
     private Random rand;
@@ -25,7 +25,6 @@ public class Game extends Application implements Protocol {
     private Board board;
     private Player loggedInPlayer;
 
-    private boolean inMatch = false;
     private Match match;
 
     public Game() {
@@ -69,28 +68,50 @@ public class Game extends Application implements Protocol {
 
     @Override
     public void start(Stage stage) {
-        this.stage = stage;
+        stages.add(stage);
         sender = new CommandSender(this);
         Thread thread = new Thread(sender);
         thread.setDaemon(true);
         thread.start();
 
         gui = new GUI(this);
-        Scene scene = new Scene(gui, 1024, 768);
+        Scene scene = new Scene(gui, 800, 600);
         stage.setTitle("Two player game");
         stage.setScene(scene);
+        stage.setX(0);
+        stage.setY(0);
         stage.show();
+        stage.setOnCloseRequest(e -> {
+            stop();
+        });
     }
 
     @Override
     public void stop() {
-        stage.close();
+        for (int i = 0; i < stages.size(); i++) {
+            stages.get(i).close();
+        }
     }
 
     public void setLogin(boolean loggedIn) {
         this.loggedIn = loggedIn;
         gui.update();
         gui.render();
+    }
+
+
+    public void showNotification(String message) {
+        showNotification(message, "", "");
+    }
+
+    public void showNotification(String message, String title, String header) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Notification: " + title);
+            alert.setHeaderText(header);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 
     public void showAlert(String message) {
@@ -118,7 +139,10 @@ public class Game extends Application implements Protocol {
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         if (match == null) {
+            showAlert("You're placed in a match. Good luck!");
             match = new Match(gameType, playerOne, playerTwo);
+        } else {
+            showAlert("You're already in a match.");
         }
     }
 

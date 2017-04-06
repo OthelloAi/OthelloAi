@@ -9,7 +9,7 @@ import app.Token;
  */
 public class GridNode extends StackPane {
     public GridNode(Token token) {
-        setPrefSize(100, 100);
+        setPrefSize(50, 50);
         Text text = new Text(token.toString());
         text.setStyle("-fx-font-size: 50px");
         getChildren().add(text);

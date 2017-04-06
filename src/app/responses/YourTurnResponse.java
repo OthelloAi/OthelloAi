@@ -17,8 +17,12 @@ public class YourTurnResponse implements Response {
 
     @Override
     public void handle() {
-//        game.getMatch()
-        System.out.println("It's your turn");
+        String message = game.getLoggedInPlayer().getUsername() + " its your turn";
+        game.showNotification(message);
+        System.out.println(message);
+
+        // if human actor then do nothing
+        // else if ai then get best move and send
         // get next move and then send it
 //        game.requestNewMove()
 //        game.handleCommand(new MoveCommand(game.getNextMove()));

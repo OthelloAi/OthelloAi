@@ -76,7 +76,7 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
-                return new ChallengeResponse(params);
+                return new ChallengeResponse(game, params);
             }
 
             if (responseString.startsWith("GAME MOVE", 4)) {

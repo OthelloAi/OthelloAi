@@ -20,11 +20,20 @@ public class GameMatchResponse implements Response {
     }
     @Override
     public void handle() {
-        System.out.println(params.get("PLAYERTOMOVE"));
-        System.out.println(params.get("OPPONENT"));
+        Player opponent = new Player(params.get("OPPONENT"));
+        Player loggedInPlayer = game.getLoggedInPlayer();
+        Player playerOne;
+        Player playerTwo;
+        if (params.get("PLAYERTOMOVE").equals(loggedInPlayer.getUsername())) {
+            playerOne = loggedInPlayer;
+            playerTwo = opponent;
+        } else {
+            playerOne = opponent;
+            playerTwo = loggedInPlayer;
+        }
         game.startMatch(
-                new Player(params.get("PLAYERTOMOVE")),
-                new Player(params.get("OPPONENT")),
+                playerOne,
+                playerTwo,
                 Config.getGameTypeFromName(params.get("GAMETYPE")));
     }
 }

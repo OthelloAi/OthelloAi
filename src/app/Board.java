@@ -29,7 +29,7 @@ public class Board {
 //                        token = new Token('O');
 //                    }
 //                    board[y][x] = token;
-                    board[y][x] = new Token('.');
+                    board[y][x] = new Token(' ');
                 }
             }
         }
