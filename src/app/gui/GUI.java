@@ -1,9 +1,10 @@
 package app.gui;
 
-import app.Game;
-import app.Config;
+import app.*;
+
 import java.util.List;
-import app.GameType;
+
+import app.gui.dialogs.MoveDialog;
 import javafx.util.Pair;
 import app.commands.*;
 import java.util.Optional;
@@ -55,9 +56,31 @@ public class GUI extends BorderPane {
                 getChallengeButton(),
                 getPlayerListButton(),
 //                getGameListButton(),
+                getMoveButton(),
                 getLogoutButton()
         );
         return hBox;
+    }
+
+    private Button getMoveButton() {
+        Button btn = new Button("Move");
+        btn.setPrefSize(80, 30);
+        btn.setOnAction(e -> {
+            MoveDialog dialog = new MoveDialog();
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(movePosition -> {
+                System.out.println(movePosition);
+                if (game.isLoggedIn()) {
+                    if (game.isInMatch()) {
+                        Move move = new Move(Integer.parseInt(movePosition), game.getLoggedInPlayer());
+                        game.handleCommand(new MoveCommand(move));
+                    }
+                }
+//                System.out.println("Move: " + move.getPosition() + " - " + move.getPlayer());
+//                game.handleCommand(new MoveCommand(new Move(Integer.getInteger(movePosition), game.getLoggedInPlayer())));
+            });
+        });
+        return btn;
     }
 
     private Button getChallengeButton() {
