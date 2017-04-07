@@ -81,9 +81,7 @@ public class Game extends Application implements Protocol {
         stage.setX(0);
         stage.setY(0);
         stage.show();
-        stage.setOnCloseRequest(e -> {
-            stop();
-        });
+        stage.setOnCloseRequest(e -> stop());
     }
 
     @Override
@@ -132,7 +130,6 @@ public class Game extends Application implements Protocol {
     }
 
     public void handleCommand(Command command) {
-//        System.out.println(command);
         sender.addCommand(command);
     }
 
@@ -142,19 +139,10 @@ public class Game extends Application implements Protocol {
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         System.out.println("your in a new match..");
-//        if (match == null || match.isFinished()) {
-            showAlert("You're placed in a match. Good luck!");
-            board = new Board(gameType);
-            gui.reset();
-            match = new Match(gameType, playerOne, playerTwo);
-//            gui.update();
-//        } else {
-//            showAlert("You're already in a match.");
-//        }
-    }
-
-    public Move getNextMove() {
-        return new Move(0, getLoggedInPlayer());
+        showAlert("You're placed in a match. Good luck!");
+        board = new Board(gameType);
+        gui.reset();
+        match = new Match(gameType, playerOne, playerTwo);
     }
 
     public void placeMove(Move move) {
@@ -169,14 +157,16 @@ public class Game extends Application implements Protocol {
         if (match != null) {
             System.out.println("token for player: " + player.getUsername());
             if (player.getUsername().equals(match.getPlayerOne().getUsername())) {
-                return new Token('X');
+                if (gameType == GameType.REVERSI) return new Token(TokenState.BLACK);
+                if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.CROSS);
             }
 
             if (player.getUsername().equals(match.getPlayerTwo().getUsername())) {
-                return new Token('O');
+                if (gameType == GameType.REVERSI) return new Token(TokenState.WHITE);
+                if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.NOUGHT);
             }
         }
-        return new Token('-');
+        return new Token(TokenState.EMPTY);
     }
 
     public void update() {

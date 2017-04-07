@@ -1,12 +1,19 @@
 package app;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * @author Joël Hoekstra
  */
-public class Board {
+public final class Board {
+
+    public static final int BOARD_LENGTH = 8;
+    public static final int BOARD_WIDTH = 8;
+    private Map<Point, Token> grid;
 
     private Token[][] board = null;
     private GameType gameType;
@@ -15,8 +22,34 @@ public class Board {
     public Board(GameType gameType) {
         this.gameType = gameType;
         rand = new Random();
+
+        grid = new HashMap<>(BOARD_LENGTH * BOARD_WIDTH);
+
         generateBoard();
+        init();
     }
+
+    public void init() {
+        Point point = new Point();
+        for (point.x = 0; point.x < BOARD_LENGTH; point.x++) {
+            for (point.y = 0; point.y < BOARD_WIDTH; point.y++) {
+                grid.put(new Point(point), new Token(TokenState.EMPTY));
+            }
+        }
+
+        grid.put(new Point(3,3), new Token(TokenState.WHITE));
+        grid.put(new Point(3,4), new Token(TokenState.BLACK));
+        grid.put(new Point(3,3), new Token(TokenState.BLACK));
+        grid.put(new Point(4,4), new Token(TokenState.WHITE));
+    }
+
+    public Token getToken(Point point) {
+        return grid.get(point);
+    }
+
+//    public Set<Point> getTokens()
+
+
 
     private void generateBoard() {
         Token token;
@@ -30,23 +63,26 @@ public class Board {
 //                        token = new Token('O');
 //                    }
 //                    board[y][x] = token;
-                    board[y][x] = new Token(' ');
+                    board[y][x] = new Token(TokenState.EMPTY);
                 }
             }
         }
 
         if (gameType == GameType.REVERSI) {
             board = new Token[8][8];
-                for (int x = 0; x < 8; x++) {
-                    for (int y = 0; y < 8; y++) {
-//                    board[y][x] = new Token(alphabet[y*8+x]);
+            for (int x = 0; x < 8; x++) {
+                for (int y = 0; y < 8; y++) {
+                    board[y][x] = new Token(TokenState.EMPTY);
 //                    if ((y * 8 + x) == 27) board[y][x] = new Token('O');
 //                    if ((y * 8 + x) == 28) board[y][x] = new Token('X');
 //                    if ((y * 8 + x) == 35) board[y][x] = new Token('X');
 //                    if ((y * 8 + x) == 36) board[y][x] = new Token('O');
-
                 }
             }
+            board[3][3] = new Token(TokenState.WHITE);
+            board[3][4] = new Token(TokenState.BLACK);
+            board[4][3] = new Token(TokenState.BLACK);
+            board[4][4] = new Token(TokenState.WHITE);
         }
     }
 
