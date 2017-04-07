@@ -99,6 +99,7 @@ public class InputHandler implements Runnable {
                 // PLAYERONESCORE
                 // PLAYERTWOSCORE
                 // COMMENT
+                return new GameWinResponse(game, params);
             }
 
             if (responseString.startsWith("GAME DRAW", 4)) {
@@ -107,10 +108,11 @@ public class InputHandler implements Runnable {
                 for (String key : params.keySet()) {
                     System.out.println(key + ": " + params.get(key));
                 }
-                // SVR GAME WIN {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
+                // SVR GAME DRAW {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
                 // PLAYERONESCORE
                 // PLAYERTWOSCORE
                 // COMMENT
+                return new GameDrawResponse(game, params);
             }
 
             if (responseString.startsWith("GAME LOSS", 4)) {
@@ -123,7 +125,7 @@ public class InputHandler implements Runnable {
                 // PLAYERONESCORE
                 // PLAYERTWOSCORE
                 // COMMENT
-
+                return new GameLossResponse(game, params);
             }
         } else if (responseString.equals("OK")) {
             Command responseTo = sender.getOldestSentCommand();
