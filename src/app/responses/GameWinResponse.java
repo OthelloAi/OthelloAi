@@ -1,6 +1,7 @@
 package app.responses;
 
 import app.Game;
+import app.Player;
 
 import java.util.Map;
 
@@ -18,6 +19,10 @@ public class GameWinResponse implements Response {
 
     @Override
     public void handle() {
-        game.showNotification(game.getLoggedInPlayer().getUsername() + ", you won the match!" + "Score: " + params);
+        Player opponent = new Player(params.get("OPPONENT"));
+        Player loggedInPlayer = game.getLoggedInPlayer();
+        // TODO: 7-4-2017 Add player score and reason for win 
+        
+        game.showNotification(loggedInPlayer.getUsername() + ", you won the match!" + "Score: " + params);
     }
 }
