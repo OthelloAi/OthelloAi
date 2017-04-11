@@ -2,6 +2,9 @@ package app.responses;
 
 import app.Game;
 import app.Player;
+import app.gui.alerts.YouWonAlert;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.util.Map;
 
@@ -19,8 +22,9 @@ public class GameWinResponse implements Response {
 
     @Override
     public void handle() {
-        Player loggedInPlayer = game.getLoggedInPlayer();
-        // TODO: 7-4-2017 Add player score and reason for win
-        game.showNotification(loggedInPlayer.getUsername() + ", you won the match!" + "Score: " + params);
+        Platform.runLater(() -> {
+            Alert alert = new YouWonAlert();
+            alert.showAndWait();
+        });
     }
 }
