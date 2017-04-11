@@ -17,7 +17,7 @@ public class YourTurnResponse implements Response {
 
     @Override
     public void handle() {
-        String message = game.getLoggedInPlayer().getUsername() + " its your turn";
+        String message = game.getLoggedInPlayer().getUsername() + ", it's your turn";
         game.showNotification(message);
         System.out.println(message);
 
