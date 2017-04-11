@@ -20,7 +20,8 @@ public class YourTurnResponse implements Response {
     @Override
     public void handle() {
         String message = game.getLoggedInPlayer().getUsername() + ", it's your turn";
-        game.showNotification(message);
+        // TODO: 11-4-2017 Create notification list with 'you turn' notification in it 
+        // game.showNotification(message);
         System.out.println(message);
 
         // if human actor then do nothing
