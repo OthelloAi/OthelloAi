@@ -24,6 +24,7 @@ public class Game extends Application implements Protocol {
     private boolean loggedIn = false;
     private Board board;
     private Player loggedInPlayer;
+    private ArrayList<Challenge> pendingChallenges = new ArrayList<Challenge>();
 
     private Match match;
 
@@ -54,9 +55,8 @@ public class Game extends Application implements Protocol {
         return (match != null && match.isStarted() && !match.isFinished());
     }
 
-    public ArrayList<Player> getPlayerList() {
-        return playerList;
-    }
+    public ArrayList<Player> getPlayerList() {return playerList;}
+
 
     public Token[][] getBoard() {
         return board.getBoard();
@@ -65,6 +65,14 @@ public class Game extends Application implements Protocol {
     public void setPlayers(ArrayList<Player> playerList) {
         this.playerList = playerList;
     }
+
+    public void addPendingChallenge(Challenge challenge) {
+        this.pendingChallenges.add(challenge);
+        //TODO With @Martijn alerts toevoegen.
+    }
+
+
+    public ArrayList<Challenge> getPendingChallenges() {return pendingChallenges;}
 
     @Override
     public void start(Stage stage) {
@@ -171,4 +179,6 @@ public class Game extends Application implements Protocol {
         }
         return new Token('-');
     }
+
+
 }
