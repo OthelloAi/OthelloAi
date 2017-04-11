@@ -4,13 +4,18 @@ package app;
  * @author Joël Hoekstra
  */
 public class Token {
-    private char token;
+    private TokenState tokenState;
 
-    public Token(char token) {
-        this.token = token;
+    public Token(TokenState tokenState) {
+        this.tokenState = tokenState;
     }
 
+    public TokenState getState() {
+        return tokenState;
+    }
+
+    @Override
     public String toString() {
-        return "" + token;
+        return "" + tokenState.symbol();
     }
 }

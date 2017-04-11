@@ -2,6 +2,8 @@ package app.responses;
 
 import app.Game;
 import app.Move;
+import app.actors.Actor;
+import app.actors.IterativeActor;
 import app.commands.MoveCommand;
 
 /**
@@ -17,8 +19,9 @@ public class YourTurnResponse implements Response {
 
     @Override
     public void handle() {
-        String message = game.getLoggedInPlayer().getUsername() + " its your turn";
-        game.showNotification(message);
+        String message = game.getLoggedInPlayer().getUsername() + ", it's your turn";
+        // TODO: 11-4-2017 Create notification list with 'you turn' notification in it 
+        // game.showNotification(message);
         System.out.println(message);
 
         // if human actor then do nothing
