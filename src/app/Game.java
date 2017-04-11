@@ -24,6 +24,7 @@ public class Game extends Application implements Protocol {
     private boolean loggedIn = false;
     private Board board;
     private Player loggedInPlayer;
+    private Thread commandSenderThread = null;
 
     private Match match;
 
@@ -70,9 +71,9 @@ public class Game extends Application implements Protocol {
     public void start(Stage stage) {
         stages.add(stage);
         sender = new CommandSender(this);
-        Thread thread = new Thread(sender);
-        thread.setDaemon(true);
-        thread.start();
+        commandSenderThread = new Thread(sender);
+        commandSenderThread.setDaemon(true);
+        commandSenderThread.start();
 
         gui = new GUI(this);
         Scene scene = new Scene(gui, 800, 600);
@@ -88,6 +89,7 @@ public class Game extends Application implements Protocol {
 
     @Override
     public void stop() {
+        commandSenderThread.interrupt();
         for (int i = 0; i < stages.size(); i++) {
             stages.get(i).close();
         }

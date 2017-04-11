@@ -5,6 +5,7 @@ import app.commands.LoginCommand;
 import app.commands.NullCommand;
 import app.commands.PlayerListCommand;
 import app.responses.Response;
+import javafx.application.Platform;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class CommandSender implements Protocol, Runnable {
     private Socket socket;
     private boolean running;
     private InputHandler inputHandler;
+    private int connectionAttempts = 0;
 
     private Game game;
 
@@ -39,38 +41,35 @@ public class CommandSender implements Protocol, Runnable {
     @Override
     public void run() {
         try {
-            socket = new Socket(SERVER_HOST, SERVER_PORT);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            inputHandler = new InputHandler(game, in, this);
-            Thread thread = new Thread(inputHandler);
-            thread.setDaemon(true);
-            thread.start();
+            connect();
+            if (socket != null) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                inputHandler = new InputHandler(game, in, this);
+                Thread thread = new Thread(inputHandler);
+                thread.setDaemon(true);
+                thread.start();
 
-            while (running) {
-                if (commands.size() > 0) {
-                    Command command = commands.get(0);
-                    out.println(command.toString());
-                    addSentCommand(command);
-                    System.out.println("[CLNT] command: " + command.toString());
-                    commands.remove(0);
-                }
+                while (running) {
+                    if (commands.size() > 0) {
+                        Command command = commands.get(0);
+                        out.println(command.toString());
+                        addSentCommand(command);
+                        System.out.println("[CLNT] command: " + command.toString());
+                        commands.remove(0);
+                    }
 
-                if (responses.size() > 0) {
-                    Response response = responses.get(0);
-                    response.handle();
-                    System.out.println("[CLNT] response handled");
+                    if (responses.size() > 0) {
+                        Response response = responses.get(0);
+                        response.handle();
+                        System.out.println("[CLNT] response handled");
+                    }
+                    Thread.sleep(10);
                 }
-                Thread.sleep(10);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -92,6 +91,37 @@ public class CommandSender implements Protocol, Runnable {
             return sentCommands.removeFirst();
         } else {
             return new NullCommand();
+        }
+    }
+
+    public void connect() {
+
+        connectionAttempts++;
+        try {
+
+            socket = new Socket(SERVER_HOST, SERVER_PORT);
+        } catch (Exception e) {
+            System.out.println("Error while attempting to establish a connection");
+
+        }
+        if (socket == null) {
+            reconnect();
+        }
+    }
+
+    public void reconnect() {
+        if (connectionAttempts > MAX_CONNECTION_ATTEMPTS) {
+            System.out.println("Could not establish a connection.");
+            Platform.runLater(() -> {
+                game.stop();
+            });
+        } else {
+            System.out.println("Attempting to establish a connection in 1 seconds...");
+            System.out.println("Attempt " + connectionAttempts + "/" + MAX_CONNECTION_ATTEMPTS);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {}
+            connect();
         }
     }
 }
