@@ -59,6 +59,7 @@ public class GUI extends BorderPane {
                 getSubscribeButton(),
                 getChallengeButton(),
                 getPlayerListButton(),
+                getAllPlayersButton(),
                 getMoveButton(),
                 getAiButton(),
                 getLogoutButton()
@@ -155,6 +156,12 @@ public class GUI extends BorderPane {
         return btn;
     }
 
+    private Button getAllPlayersButton() {
+        Button btn = new Button("Show all players");
+        btn.setPrefSize(80, 30);
+        btn.setOnAction(e->game.handleCommand(new PlayerListCommand()));
+        return btn;
+    }
 
     private Button getPlayerListButton() {
         Button btn = new Button("Get Playerlist");
@@ -162,7 +169,24 @@ public class GUI extends BorderPane {
         btn.setOnAction(e -> game.handleCommand(new PlayerListCommand()));
         return btn;
     }
+  
+    private Button getPendingChallenges(){
+        Button btn = new Button("Get pending challenges");
+        btn.setPrefSize(80,30);
+        btn.setOnAction(e-> {
+            ArrayList<Challenge> challenges = game.getPendingChallenges();
 
+        });
+        return btn;
+    }
+
+    private Button getGameListButton() {
+        Button btn = new Button("games");
+        btn.setPrefSize(80, 30);
+        btn.setOnAction(e -> game.handleCommand(new GameListCommand()));
+        return btn;
+    }
+  
     public void reset() {
         gameGUI = null;
         update();
