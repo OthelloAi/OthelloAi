@@ -13,6 +13,8 @@ import app.gui.GUI;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Joël Hoekstra
@@ -79,11 +81,14 @@ public class Game extends Application implements Protocol {
 
     @Override
     public void start(Stage stage) {
+        CountDownLatch latch = new CountDownLatch(1);
         stages.add(stage);
-        sender = new CommandSender(this);
+        sender = new CommandSender(this, latch);
         commandSenderThread = new Thread(sender);
         commandSenderThread.setDaemon(true);
         commandSenderThread.start();
+
+        boolean showFrame = false;
 
         gui = new GUI(this);
         Scene scene = new Scene(gui, 800, 600);
@@ -91,9 +96,36 @@ public class Game extends Application implements Protocol {
         stage.setScene(scene);
         stage.setX(0);
         stage.setY(0);
-        stage.show();
         stage.setOnCloseRequest(e -> stop());
+
+        try {
+            if (latch.await(10, TimeUnit.SECONDS)) {
+                showFrame = true;
+                System.out.println("latch wait");
+            } else {
+                System.exit(0);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (showFrame) {
+            stage.show();
+        }
     }
+
+//        if (sender.isConnected && showFrame) {
+//            gui = new GUI(this);
+//            Scene scene = new Scene(gui, 800, 600);
+//            stage.setTitle("Two player game");
+//            stage.setScene(scene);
+//            stage.setX(0);
+//            stage.setY(0);
+//            stage.setOnCloseRequest(e -> stop());
+//            stage.show();
+//        } else {
+////            System.exit(0);
 
     @Override
     public void stop() {

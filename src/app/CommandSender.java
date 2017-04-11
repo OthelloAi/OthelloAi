@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Joël Hoekstra
@@ -26,10 +27,11 @@ public class CommandSender implements Protocol, Runnable {
     private boolean running;
     private InputHandler inputHandler;
     private int connectionAttempts = 0;
-
+    private CountDownLatch latch;
     private Game game;
-
-    public CommandSender(Game game) {
+    public boolean isConnected = false;
+    public CommandSender(Game game, CountDownLatch latch) {
+        this.latch = latch;
         this.game = game;
         socket = null;
         commands = new ArrayList<>();
@@ -49,7 +51,7 @@ public class CommandSender implements Protocol, Runnable {
                 Thread thread = new Thread(inputHandler);
                 thread.setDaemon(true);
                 thread.start();
-
+                latch.countDown();
                 while (running) {
                     if (commands.size() > 0) {
                         Command command = commands.get(0);
@@ -68,6 +70,8 @@ public class CommandSender implements Protocol, Runnable {
                 }
             }
 
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -100,10 +104,13 @@ public class CommandSender implements Protocol, Runnable {
         try {
 
             socket = new Socket(SERVER_HOST, SERVER_PORT);
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("Error while attempting to establish a connection");
 
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
         if (socket == null) {
             reconnect();
         }
