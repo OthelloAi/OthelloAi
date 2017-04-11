@@ -1,7 +1,6 @@
 package app.responses;
 
 import app.Game;
-import app.Player;
 import app.gui.alerts.YouWonAlert;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
