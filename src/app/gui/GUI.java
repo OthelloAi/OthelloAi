@@ -26,7 +26,6 @@ import app.gui.dialogs.SubscribeDialog;
 public class GUI extends BorderPane {
     private Game game;
     private GameGUI gameGUI;
-    private Actor actor = new RandomActor();
 
     public GUI(Game game) {
         this.game = game;
@@ -71,7 +70,7 @@ public class GUI extends BorderPane {
         Button btn = new Button("AI");
         btn.setPrefSize(80, 30);
         btn.setOnAction(e -> {
-            int position = actor.getNext(game.getPossibleMoves());
+            int position = game.getActor().getNext(game.getPossibleMoves());
             Move move = new Move(position, game.getLoggedInPlayer());
             game.handleCommand(new MoveCommand(move));
         });

@@ -1,10 +1,7 @@
 package app;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author Joël Hoekstra
@@ -47,9 +44,67 @@ public final class Board {
         return grid.get(point);
     }
 
-//    public Set<Point> getTokens()
+    public Set<Point> getTokens(Token token) {
+        Set<Point> points = new HashSet<>();
+        for (Point point : grid.keySet()) {
+            if (grid.get(point) == token) {
+                points.add(point);
+            }
+        }
+        return points;
+    }
+
+    public boolean isFull() {
+        for (Point point : grid.keySet()) {
+            if (grid.get(point).getState() == TokenState.EMPTY) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
+    public int count(Token token) {
+        int count = 0;
+        for (Point point : grid.keySet()) {
+            if (grid.get(point) == token) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public Set<Point> getPossibleMoves(Player player) {
+        return MoveExplorer.explore(this, player);
+    }
+
+    public void markPossibleMoves(Set<Point> possibleMoves) {
+        for (Point point : possibleMoves) {
+            grid.put(point, new Token(TokenState.POSSIBLE));
+        }
+    }
+
+    public void unmarkPossibleMoves() {
+        for (Point point : grid.keySet()) {
+            if (grid.get(point).getState() == TokenState.POSSIBLE) {
+                grid.put(point, new Token(TokenState.EMPTY));
+            }
+        }
+    }
+
+    public void mark(Set<Point> points, Token token) {
+        for (Point point : points) {
+            grid.put(point, token);
+        }
+    }
+
+    public Set<Point> makeMove(Point move, Token token) {
+        grid.put(move, token);
+        Set<Point> changedTokens = MoveExplorer.pointsToFill(this, move);
+        mark(changedTokens, token);
+        changedTokens.add(move);
+        return changedTokens;
+    }
 
     private void generateBoard() {
         Token token;

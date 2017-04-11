@@ -1,5 +1,8 @@
 package app;
 
+import app.actors.Actor;
+import app.actors.MiniMaxActor;
+import app.actors.RandomActor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -25,11 +28,18 @@ public class Game extends Application implements Protocol {
     private Board board;
     private Player loggedInPlayer;
 
+    private Actor actor;
     private Match match = null;
 
     public Game() {
         rand = new Random();
         board = new Board(gameType);
+//        actor = new RandomActor();
+        actor = new MiniMaxActor(this, board);
+    }
+
+    public Actor getActor() {
+        return actor;
     }
 
     public GameType getGameType() {

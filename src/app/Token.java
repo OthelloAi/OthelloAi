@@ -10,8 +10,12 @@ public class Token {
         this.tokenState = tokenState;
     }
 
+    public TokenState getState() {
+        return tokenState;
+    }
+
     @Override
     public String toString() {
-        return "" + tokenState.symbol();//String.valueOf(tokenState.symbol());
+        return "" + tokenState.symbol();
     }
 }
