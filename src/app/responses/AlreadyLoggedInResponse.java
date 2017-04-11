@@ -1,6 +1,10 @@
 package app.responses;
 
 import app.Game;
+import app.gui.alerts.AlreadyLoggedInAlert;
+import app.gui.alerts.YouWonAlert;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 /**
  * @author Joël Hoekstra
@@ -15,10 +19,9 @@ public class AlreadyLoggedInResponse implements Response {
 
     @Override
     public void handle() {
-        String message = "Oops you are already logged in";
-        game.showAlert(
-                message,
-                "Already Logged In",
-                "Login Error");
+        Platform.runLater(() -> {
+            Alert alert = new AlreadyLoggedInAlert();
+            alert.showAndWait();
+        });
     }
 }
