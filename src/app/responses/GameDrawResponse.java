@@ -19,10 +19,8 @@ public class GameDrawResponse implements Response {
 
     @Override
     public void handle() {
-        Player opponent = new Player(params.get("OPPONENT"));
         Player loggedInPlayer = game.getLoggedInPlayer();
         // TODO: 7-4-2017 Add player score and reason for draw
-
-        game.showNotification(game.getLoggedInPlayer().getUsername() + ", it's a draw!");
+        game.showNotification(loggedInPlayer.getUsername() + ", it's a draw!");
     }
 }

@@ -19,10 +19,8 @@ public class GameLossResponse implements Response {
 
     @Override
     public void handle() {
-        Player opponent = new Player(params.get("OPPONENT"));
         Player loggedInPlayer = game.getLoggedInPlayer();
         // TODO: 7-4-2017 Add player score and reason for loss
-
-        game.showNotification(game.getLoggedInPlayer().getUsername() + ", you lost the match!");
+        game.showNotification(loggedInPlayer.getUsername() + ", you lost the match!");
     }
 }

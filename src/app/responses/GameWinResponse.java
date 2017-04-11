@@ -19,10 +19,8 @@ public class GameWinResponse implements Response {
 
     @Override
     public void handle() {
-        Player opponent = new Player(params.get("OPPONENT"));
         Player loggedInPlayer = game.getLoggedInPlayer();
-        // TODO: 7-4-2017 Add player score and reason for win 
-        
+        // TODO: 7-4-2017 Add player score and reason for win
         game.showNotification(loggedInPlayer.getUsername() + ", you won the match!" + "Score: " + params);
     }
 }
