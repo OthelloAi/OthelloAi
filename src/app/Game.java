@@ -2,6 +2,9 @@ package app;
 
 import app.actors.Actor;
 import app.actors.MiniMaxActor;
+import app.gui.alerts.CouldNotConnectAlert;
+import app.gui.dialogs.ConnectionDialog;
+import app.gui.dialogs.LoginDialog;
 import app.gui.alerts.AcceptDeclineAlert;
 import app.gui.alerts.StartMatchAlert;
 import javafx.application.Application;
@@ -12,10 +15,15 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import app.commands.*;
 import app.gui.GUI;
+import org.omg.PortableInterceptor.INACTIVE;
 
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Joël Hoekstra
@@ -32,6 +40,10 @@ public class Game extends Application implements Protocol {
     private Player loggedInPlayer;
     private ArrayList<Challenge> pendingChallenges = new ArrayList<Challenge>();
     private Thread commandSenderThread = null;
+    private String hostName = SERVER_HOST;
+    private int portNumber = SERVER_PORT;
+
+    CountDownLatch latch = new CountDownLatch(1);
     private Actor actor;
     private Match match = null;
 
@@ -99,11 +111,26 @@ public class Game extends Application implements Protocol {
 
     @Override
     public void start(Stage stage) {
+        Connection connection = new Connection();
+        while (true) {
+            if (askConnectionInfo()) {
+                connection.connect(hostName, portNumber);
+                if (connection.isConnected()) {
+                    break;
+                } else {
+                    Alert alert = new CouldNotConnectAlert();
+                    alert.setContentText("Could not connect to server");
+                    alert.showAndWait();
+                }
+            }
+        }
         stages.add(stage);
-        sender = new CommandSender(this);
+        sender = new CommandSender(this, latch, connection.getSocket());
         commandSenderThread = new Thread(sender);
         commandSenderThread.setDaemon(true);
         commandSenderThread.start();
+
+        askLoginName();
 
         gui = new GUI(this);
         Scene scene = new Scene(gui, 800, 600);
@@ -113,7 +140,79 @@ public class Game extends Application implements Protocol {
         stage.setY(0);
         stage.show();
         stage.setOnCloseRequest(e -> stop());
+
+        try {
+            // Wait for CommandSenderThread to connect to server
+            if (latch.await(2, TimeUnit.SECONDS)) {
+                // Show the GUI
+                stage.show();
+            } else {
+                System.exit(0);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
+
+    public boolean askConnectionInfo() {
+
+        // Create a new Dialog asking for an ip address and port number
+        ConnectionDialog connectionDialog = new ConnectionDialog();
+        Optional<String> connectionResult = connectionDialog.showAndWait();
+
+        // Check if the user pressed OK
+        if (connectionResult.isPresent()) {
+            // Check if connectionResult is a valid ip address and port number
+            String str = connectionResult.get();
+            Pattern pattern = Pattern.compile("\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}:\\d{1,6}|localhost:\\d{1,5}");
+            Matcher matcher = pattern.matcher(str);
+            // If connectionResult is valid set hostName and portNumber
+            if (matcher.find()) {
+                hostName = str.substring(0, str.indexOf(":"));
+                portNumber = Integer.parseInt(str.substring(str.indexOf(":")+1));
+                System.out.println("hostname: " + hostName);
+                System.out.println("Port number: " + portNumber);
+                return true;
+            } else {
+                // If result is not valid show error message
+                Alert alert = new CouldNotConnectAlert();
+                alert.setContentText("Invalid ip address or port number");
+                alert.showAndWait();
+                return false;
+
+            }
+        } else {
+            System.exit(0);
+        }
+        return false;
+    }
+
+    public void askLoginName() {
+        try {
+            // Wait for commandSenderThread to connect to server
+            if (latch.await(2, TimeUnit.SECONDS)) {
+                // Create a new Dialog asking for login name
+                LoginDialog dialog = new LoginDialog();
+                Optional<String> loginResult = dialog.showAndWait();
+                loginResult.ifPresent(command -> this.handleCommand(new LoginCommand(loginResult.get())));
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+//        if (sender.isConnected && showFrame) {
+//            gui = new GUI(this);
+//            Scene scene = new Scene(gui, 800, 600);
+//            stage.setTitle("Two player game");
+//            stage.setScene(scene);
+//            stage.setX(0);
+//            stage.setY(0);
+//            stage.setOnCloseRequest(e -> stop());
+//            stage.show();
+//        } else {
+////            System.exit(0);
 
     @Override
     public void stop() {
@@ -131,7 +230,34 @@ public class Game extends Application implements Protocol {
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves();
     }
+  
+    public void showNotification(String message) {
+        showNotification(message, "", "");
+    }
 
+    public void showNotification(String message, String title, String header) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Notification: " + title);
+            alert.setHeaderText(header);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
+    }
+
+    public void showAlert(String message) {
+        showAlert(message, "", "");
+    }
+
+    public void showAlert(String message, String title, String header) {
+        Platform.runLater(() -> {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("ERROR: " + title);
+                alert.setHeaderText(header);
+                alert.setContentText(message);
+                alert.showAndWait();
+            });
+    }
     public void handleCommand(Command command) {
         sender.addCommand(command);
     }
