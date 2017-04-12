@@ -1,5 +1,8 @@
 package app;
 
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
+
 import java.awt.*;
 import java.util.*;
 
@@ -152,6 +155,9 @@ public final class Board {
                 if (this.isValidMove(move, token)) {
                     moves.add(move);
                 }
+                else {
+                    // // TODO: 12-4-2017 Move isn't valid 
+                }
             }
         }
 
@@ -159,7 +165,34 @@ public final class Board {
     }
 
     public boolean isValidMove(Move move, Token token) {
-        return true;
+
+        // Get position
+        int position = move.getPosition();
+        int posY = position / board.length;
+        int posX = position % board.length;
+        Token currentMove = board[posY][posX];
+
+        // Check whether the chosen position is empty or not
+        if (currentMove.getState() == TokenState.EMPTY){
+            // Loop through all directions
+            for (int x = -1; x <=1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    int offset = 1; //Used to look further into the same direction
+
+                    while (board[posX + (x * offset)][posY + (y * offset)].getState() == token.getState().opposite()) // While there are tokens in opposite color in a direction
+                    offset++; //Add 1 to offset
+
+                    if (offset == 1) //If the offset is still equal to one, meaning that there were no opposite tokens found, continue in the loop
+                        continue;
+                    if (board[posX + (x * offset)][posY + (y * offset)].getState() == token.getState()) //Check whether a token of some color was found after the opposite one
+                    return true; //If so, the move is valid
+                }
+            }
+        }
+        // If boolean cant return true, it'll end up here and return false
+        return false;
     }
 
     public void clear() {

@@ -2,7 +2,6 @@ package app;
 
 import app.actors.Actor;
 import app.actors.MiniMaxActor;
-import app.actors.RandomActor;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -35,7 +34,7 @@ public class Game extends Application implements Protocol {
     public Game() {
         rand = new Random();
         board = new Board(gameType);
-//        actor = new RandomActor();
+        //actor = new RandomActor();
         actor = new MiniMaxActor(this, board);
     }
 
@@ -150,7 +149,7 @@ public class Game extends Application implements Protocol {
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
-        System.out.println("your in a new match..");
+        System.out.println("You're in a new match..");
         showAlert("You're placed in a match. Good luck!");
         board = new Board(gameType);
         gui.reset();
@@ -158,11 +157,40 @@ public class Game extends Application implements Protocol {
     }
 
     public void placeMove(Move move) {
-        if (match != null) {
+        if (isLoggedIn()) {
+            if (isInMatch()) {
+                match.addMove(move);
+                board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
+                gui.update();
+            }
+        }
+        else {
+            // perhaps the reset should happen here.
+            // or an empty game gui should be rendered.
+        }
+    }
+
+    public void handleMove(Integer movePosition){
+        Move move = new Move(movePosition, getLoggedInPlayer());
+        if(board.isValidMove(move, getTokenByPlayer(move.getPlayer())))
+        {
+            System.out.println("Nice one, valid move");
             match.addMove(move);
             board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
             gui.update();
         }
+        else
+            {
+                // return alert that move isn't valid
+                System.out.println("Invalid move, bitch");
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("Invalid move");
+                    alert.setContentText("Sorry, the move you chose isn't valid");
+                    alert.showAndWait();
+                });
+            }
     }
 
     private Token getTokenByPlayer(Player player) {
