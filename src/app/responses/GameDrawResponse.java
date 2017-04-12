@@ -1,7 +1,9 @@
 package app.responses;
 
 import app.Game;
-import app.Player;
+import app.gui.alerts.DrawGameAlert;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.util.Map;
 
@@ -19,8 +21,9 @@ public class GameDrawResponse implements Response {
 
     @Override
     public void handle() {
-        Player loggedInPlayer = game.getLoggedInPlayer();
-        // TODO: 7-4-2017 Add player score and reason for draw
-        game.showNotification(loggedInPlayer.getUsername() + ", it's a draw!");
+        Platform.runLater(() -> {
+            Alert alert = new DrawGameAlert();
+            alert.showAndWait();
+        });
     }
 }

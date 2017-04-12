@@ -1,7 +1,9 @@
 package app.responses;
 
 import app.Game;
-import app.Player;
+import app.gui.alerts.YouLostAlert;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.util.Map;
 
@@ -19,8 +21,9 @@ public class GameLossResponse implements Response {
 
     @Override
     public void handle() {
-        Player loggedInPlayer = game.getLoggedInPlayer();
-        // TODO: 7-4-2017 Add player score and reason for loss
-        game.showNotification(loggedInPlayer.getUsername() + ", you lost the match!");
+        Platform.runLater(() -> {
+            Alert alert = new YouLostAlert();
+            alert.showAndWait();
+        });
     }
 }

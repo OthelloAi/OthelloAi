@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
  */
 public class DrawGameAlert extends Alert {
     public DrawGameAlert(){
+        // TODO: 7-4-2017 Add player name, score and reason for draw
         super(AlertType.INFORMATION);
         setTitle("No winner!");
         setHeaderText("It's a draw, no winner!");

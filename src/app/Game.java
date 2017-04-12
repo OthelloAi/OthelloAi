@@ -5,10 +5,13 @@ import app.actors.MiniMaxActor;
 import app.gui.alerts.CouldNotConnectAlert;
 import app.gui.dialogs.ConnectionDialog;
 import app.gui.dialogs.LoginDialog;
+import app.gui.alerts.AcceptDeclineAlert;
+import app.gui.alerts.StartMatchAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import app.commands.*;
 import app.gui.GUI;
@@ -35,19 +38,18 @@ public class Game extends Application implements Protocol {
     private boolean loggedIn = false;
     private Board board;
     private Player loggedInPlayer;
+    private ArrayList<Challenge> pendingChallenges = new ArrayList<Challenge>();
     private Thread commandSenderThread = null;
     private String hostName = SERVER_HOST;
     private int portNumber = SERVER_PORT;
 
     CountDownLatch latch = new CountDownLatch(1);
-
     private Actor actor;
     private Match match = null;
 
     public Game() {
         rand = new Random();
         board = new Board(gameType);
-//        actor = new RandomActor();
         actor = new MiniMaxActor(this, board);
     }
 
@@ -77,9 +79,8 @@ public class Game extends Application implements Protocol {
         return (match != null && match.isStarted() && !match.isFinished());
     }
 
-    public ArrayList<Player> getPlayerList() {
-        return playerList;
-    }
+    public ArrayList<Player> getPlayerList() {return playerList;}
+
 
     public Token[][] getBoard() {
         return board.getBoard();
@@ -88,6 +89,25 @@ public class Game extends Application implements Protocol {
     public void setPlayers(ArrayList<Player> playerList) {
         this.playerList = playerList;
     }
+
+    public void addPendingChallenge(Challenge challenge) {
+        this.pendingChallenges.add(challenge);
+        //TODO With @Martijn alerts toevoegen.
+        // show dialog here
+        Platform.runLater(() -> {
+            AcceptDeclineAlert dialog = new AcceptDeclineAlert();
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                handleCommand(new ChallengeAcceptCommand(challenge));
+
+            } else {
+                this.pendingChallenges.remove(challenge);
+            }
+        });
+    }
+
+
+    public ArrayList<Challenge> getPendingChallenges() {return pendingChallenges;}
 
     @Override
     public void start(Stage stage) {
@@ -210,7 +230,7 @@ public class Game extends Application implements Protocol {
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves();
     }
-
+  
     public void showNotification(String message) {
         showNotification(message, "", "");
     }
@@ -238,7 +258,6 @@ public class Game extends Application implements Protocol {
                 alert.showAndWait();
             });
     }
-
     public void handleCommand(Command command) {
         sender.addCommand(command);
     }
@@ -249,7 +268,10 @@ public class Game extends Application implements Protocol {
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         System.out.println("your in a new match..");
-        showAlert("You're placed in a match. Good luck!");
+        Platform.runLater(() -> {
+            StartMatchAlert startMatchAlert = new StartMatchAlert();
+            startMatchAlert.showAndWait();
+        });
         board = new Board(gameType);
         gui.reset();
         match = new Match(gameType, playerOne, playerTwo);
@@ -282,4 +304,6 @@ public class Game extends Application implements Protocol {
     public void update() {
         gui.update();
     }
+
+
 }
