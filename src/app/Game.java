@@ -2,16 +2,19 @@ package app;
 
 import app.actors.Actor;
 import app.actors.MiniMaxActor;
-import app.actors.RandomActor;
+import app.gui.alerts.AcceptDeclineAlert;
+import app.gui.alerts.StartMatchAlert;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import app.commands.*;
 import app.gui.GUI;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -78,6 +81,20 @@ public class Game extends Application implements Protocol {
     public void addPendingChallenge(Challenge challenge) {
         this.pendingChallenges.add(challenge);
         //TODO With @Martijn alerts toevoegen.
+        // show dialog here
+        Platform.runLater(() -> {
+//            Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
+            AcceptDeclineAlert dialog = new AcceptDeclineAlert();
+            Optional<ButtonType> result = dialog.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                // acceptcommand
+                handleCommand(new ChallengeAcceptCommand(challenge));
+
+            } else {
+                // remove from list
+                this.pendingChallenges.remove(challenge);
+            }
+        });
     }
 
 
@@ -157,7 +174,10 @@ public class Game extends Application implements Protocol {
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         System.out.println("your in a new match..");
-        showAlert("You're placed in a match. Good luck!");
+        Platform.runLater(() -> {
+            StartMatchAlert startMatchAlert = new StartMatchAlert();
+            startMatchAlert.showAndWait();
+        });
         board = new Board(gameType);
         gui.reset();
         match = new Match(gameType, playerOne, playerTwo);
