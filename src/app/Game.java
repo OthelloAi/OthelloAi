@@ -126,7 +126,6 @@ public class Game extends Application implements Protocol {
             if (latch.await(2, TimeUnit.SECONDS)) {
                 // Show the GUI
                 stage.show();
-                System.out.println("latch wait");
             } else {
                 System.exit(0);
             }
@@ -150,7 +149,6 @@ public class Game extends Application implements Protocol {
             Matcher matcher = pattern.matcher(str);
             // If connectionResult is valid set hostName and portNumber
             if (matcher.find()) {
-                System.out.println("yay");
                 hostName = str.substring(0, str.indexOf(":"));
                 portNumber = Integer.parseInt(str.substring(str.indexOf(":")+1));
                 System.out.println("hostname: " + hostName);
@@ -158,7 +156,6 @@ public class Game extends Application implements Protocol {
                 return true;
             } else {
                 // If result is not valid show error message
-                System.out.println("noooo");
                 Alert alert = new CouldNotConnectAlert();
                 alert.setContentText("Invalid ip address or port number");
                 alert.showAndWait();
