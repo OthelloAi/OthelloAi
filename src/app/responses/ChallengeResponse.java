@@ -20,7 +20,6 @@ public class ChallengeResponse implements Response {
     
     @Override
     public void handle() {
-        //game.showNotification(game.getLoggedInPlayer().getUsername() + " you have a new challenge!");
         Challenge challenge = new Challenge(params.get("CHALLENGER"), Config.getGameTypeFromName(params.get("GAMETYPE")));
         challenge.setId(Integer.parseInt(params.get("CHALLENGENUMBER")));
         game.addPendingChallenge(challenge);

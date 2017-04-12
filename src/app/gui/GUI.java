@@ -59,6 +59,7 @@ public class GUI extends BorderPane {
                 getSubscribeButton(),
                 getChallengeButton(),
                 getPlayerListButton(),
+                getForfeitButton(),
                 getAllPlayersButton(),
                 getMoveButton(),
                 getAiButton(),
@@ -184,6 +185,13 @@ public class GUI extends BorderPane {
         Button btn = new Button("games");
         btn.setPrefSize(80, 30);
         btn.setOnAction(e -> game.handleCommand(new GameListCommand()));
+        return btn;
+    }
+
+    private Button getForfeitButton(){
+        Button btn = new Button("Forfeit");
+        btn.setPrefSize(80,30);
+        btn.setOnAction(e -> game.handleCommand(new ForfeitCommand()));
         return btn;
     }
   

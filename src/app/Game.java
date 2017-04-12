@@ -83,15 +83,12 @@ public class Game extends Application implements Protocol {
         //TODO With @Martijn alerts toevoegen.
         // show dialog here
         Platform.runLater(() -> {
-//            Alert dialog = new Alert(Alert.AlertType.CONFIRMATION);
             AcceptDeclineAlert dialog = new AcceptDeclineAlert();
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == ButtonType.OK) {
-                // acceptcommand
                 handleCommand(new ChallengeAcceptCommand(challenge));
 
             } else {
-                // remove from list
                 this.pendingChallenges.remove(challenge);
             }
         });
@@ -133,35 +130,6 @@ public class Game extends Application implements Protocol {
 
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves();
-    }
-
-
-    public void showNotification(String message) {
-        showNotification(message, "", "");
-    }
-
-    public void showNotification(String message, String title, String header) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Notification: " + title);
-            alert.setHeaderText(header);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
-    }
-
-    public void showAlert(String message) {
-        showAlert(message, "", "");
-    }
-
-    public void showAlert(String message, String title, String header) {
-        Platform.runLater(() -> {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("ERROR: " + title);
-                alert.setHeaderText(header);
-                alert.setContentText(message);
-                alert.showAndWait();
-            });
     }
 
     public void handleCommand(Command command) {
