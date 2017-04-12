@@ -1,11 +1,12 @@
 package app;
 
 import app.commands.Command;
-import app.commands.LoginCommand;
 import app.commands.NullCommand;
-import app.commands.PlayerListCommand;
+import app.gui.alerts.CouldNotConnectAlert;
+import app.gui.dialogs.ConnectionDialog;
 import app.responses.Response;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -28,12 +30,15 @@ public class CommandSender implements Protocol, Runnable {
     private InputHandler inputHandler;
     private int connectionAttempts = 0;
     private CountDownLatch latch;
+    private CountDownLatch latch2;
     private Game game;
-    public boolean isConnected = false;
-    public CommandSender(Game game, CountDownLatch latch) {
+    private String hostName= SERVER_HOST;
+    private int portNumber = SERVER_PORT;
+
+    public CommandSender(Game game, CountDownLatch latch, Socket socket) {
         this.latch = latch;
         this.game = game;
-        socket = null;
+        this.socket = socket;
         commands = new ArrayList<>();
         sentCommands = new LinkedList<>();
         responses = new ArrayList<>();
@@ -43,7 +48,6 @@ public class CommandSender implements Protocol, Runnable {
     @Override
     public void run() {
         try {
-            connect();
             if (socket != null) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -52,6 +56,7 @@ public class CommandSender implements Protocol, Runnable {
                 thread.setDaemon(true);
                 thread.start();
                 latch.countDown();
+
                 while (running) {
                     if (commands.size() > 0) {
                         Command command = commands.get(0);
@@ -98,37 +103,19 @@ public class CommandSender implements Protocol, Runnable {
         }
     }
 
-    public void connect() {
-
-        connectionAttempts++;
-        try {
-
-            socket = new Socket(SERVER_HOST, SERVER_PORT);
-        } catch (IOException e) {
-            System.out.println("Error while attempting to establish a connection");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if (socket == null) {
-            reconnect();
-        }
-    }
-
-    public void reconnect() {
-        if (connectionAttempts > MAX_CONNECTION_ATTEMPTS) {
-            System.out.println("Could not establish a connection.");
-            Platform.runLater(() -> {
-                game.stop();
-            });
-        } else {
-            System.out.println("Attempting to establish a connection in 1 seconds...");
-            System.out.println("Attempt " + connectionAttempts + "/" + MAX_CONNECTION_ATTEMPTS);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {}
-            connect();
-        }
-    }
+//    public void reconnect() {
+//        if (connectionAttempts > MAX_CONNECTION_ATTEMPTS) {
+//            System.out.println("Could not establish a connection.");
+//            Platform.runLater(() -> {
+//                game.stop();
+//            });
+//        } else {
+//            System.out.println("Attempting to establish a connection in 1 seconds...");
+//            System.out.println("Attempt " + connectionAttempts + "/" + MAX_CONNECTION_ATTEMPTS);
+//            try {
+//                Thread.sleep(1000);
+//            } catch (InterruptedException e) {}
+//            connect();
+//        }
+//    }
 }
