@@ -267,7 +267,7 @@ public class Game extends Application implements Protocol {
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
-        System.out.println("your in a new match..");
+        System.out.println("You're placed in a new match..");
         Platform.runLater(() -> {
             StartMatchAlert startMatchAlert = new StartMatchAlert();
             startMatchAlert.showAndWait();
@@ -278,16 +278,44 @@ public class Game extends Application implements Protocol {
     }
 
     public void placeMove(Move move) {
-        if (match != null) {
-            match.addMove(move);
-            board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
-            gui.update();
+        if (isLoggedIn()) {
+            if (isInMatch()) {
+                match.addMove(move);
+                board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
+                board.flipColors(move, getTokenByPlayer(move.getPlayer()));
+                gui.update();
+            }
         }
+        else {
+            // perhaps the reset should happen here.
+            // or an empty game gui should be rendered.
+        }
+    }
+
+    public void handleMove(Integer movePosition){
+        Move move = new Move(movePosition, getLoggedInPlayer());
+        if(board.isValidMove(move, getTokenByPlayer(move.getPlayer())))
+        {
+            handleCommand(new MoveCommand(move));
+            System.out.println("Nice one, valid move");
+        }
+        else
+            {
+                // return alert that move isn't valid
+                System.out.println("Invalid move!");
+                Platform.runLater(() -> {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("ERROR");
+                    alert.setHeaderText("Invalid move");
+                    alert.setContentText("Sorry, the move you chose isn't valid");
+                    alert.showAndWait();
+                });
+            }
     }
 
     private Token getTokenByPlayer(Player player) {
         if (match != null) {
-            System.out.println("token for player: " + player.getUsername());
+            System.out.println("Token for player: " + player.getUsername());
             if (player.getUsername().equals(match.getPlayerOne().getUsername())) {
                 if (gameType == GameType.REVERSI) return new Token(TokenState.BLACK);
                 if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.CROSS);

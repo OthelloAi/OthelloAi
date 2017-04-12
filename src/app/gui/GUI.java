@@ -2,12 +2,15 @@ package app.gui;
 
 import app.*;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseListener;
 import java.util.List;
 
 import app.actors.Actor;
 import app.actors.IterativeActor;
 import app.actors.RandomActor;
 import app.gui.dialogs.MoveDialog;
+import javafx.scene.input.MouseEvent;
 import javafx.util.Pair;
 import app.commands.*;
 import java.util.Optional;
@@ -20,17 +23,21 @@ import app.gui.dialogs.LoginDialog;
 import app.gui.dialogs.ChallengeDialog;
 import app.gui.dialogs.SubscribeDialog;
 
+import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
+
 /**
  * @author Joël Hoekstra
  */
 public class GUI extends BorderPane {
     private Game game;
     private GameGUI gameGUI;
+    Integer movePosition;
 
     public GUI(Game game) {
         this.game = game;
         setBottom(getButtons());
         render();
+
     }
 
     public void render() {
@@ -86,18 +93,9 @@ public class GUI extends BorderPane {
             MoveDialog dialog = new MoveDialog();
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(movePosition -> {
-                System.out.println(movePosition);
-                if (game.isLoggedIn()) {
-                    if (game.isInMatch()) {
-                        Move move = new Move(Integer.parseInt(movePosition), game.getLoggedInPlayer());
-                        game.handleCommand(new MoveCommand(move));
-                    } else {
-                        // perhaps the reset should happen here.
-                        // or an empty game gui should be rendered.
-                    }
-                }
-//                System.out.println("Move: " + move.getPosition() + " - " + move.getPlayer());
-//                game.handleCommand(new MoveCommand(new Move(Integer.getInteger(movePosition), game.getLoggedInPlayer())));
+                this.movePosition = Integer.parseInt(movePosition);
+                System.out.println(this.movePosition);
+                game.handleMove(this.movePosition);
             });
         });
         return btn;
