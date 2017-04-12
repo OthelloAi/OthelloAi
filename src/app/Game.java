@@ -161,6 +161,7 @@ public class Game extends Application implements Protocol {
             if (isInMatch()) {
                 match.addMove(move);
                 board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
+                board.flipColors(move, getTokenByPlayer(move.getPlayer()));
                 gui.update();
             }
         }
@@ -174,10 +175,8 @@ public class Game extends Application implements Protocol {
         Move move = new Move(movePosition, getLoggedInPlayer());
         if(board.isValidMove(move, getTokenByPlayer(move.getPlayer())))
         {
+            handleCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
-            match.addMove(move);
-            board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
-            gui.update();
         }
         else
             {
