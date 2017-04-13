@@ -5,8 +5,6 @@ package app.commands;
  */
 public class PlayerListCommand implements Command {
     @Override
-    public String toString() {
-        return "get playerlist";
-    }
+    public String toString() {return "get playerlist";}
 
 }

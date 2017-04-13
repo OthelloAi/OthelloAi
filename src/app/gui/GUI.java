@@ -9,8 +9,13 @@ import java.util.List;
 import app.actors.Actor;
 import app.actors.IterativeActor;
 import app.actors.RandomActor;
-import app.gui.dialogs.MoveDialog;
+import app.gui.dialogs.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.Pair;
 import app.commands.*;
 import java.util.Optional;
@@ -19,9 +24,6 @@ import javafx.scene.layout.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.application.Platform;
-import app.gui.dialogs.LoginDialog;
-import app.gui.dialogs.ChallengeDialog;
-import app.gui.dialogs.SubscribeDialog;
 
 import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
 
@@ -158,7 +160,45 @@ public class GUI extends BorderPane {
     private Button getAllPlayersButton() {
         Button btn = new Button("Show all players");
         btn.setPrefSize(80, 30);
-        btn.setOnAction(e->game.handleCommand(new PlayerListCommand()));
+        btn.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
+
+            Stage stage = new Stage();
+
+            GridPane grid = new GridPane();
+            grid.setAlignment(Pos.CENTER);
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(25, 25, 25, 25));
+            Scene scene = new Scene(grid, 300, 300);
+            stage.setScene(scene);
+            stage.setTitle("All players");
+            stage.show();
+
+            ListView lv = new ListView();
+            Platform.runLater(() -> {
+                for (Player player : game.getPlayerList()) {
+                    lv.getItems().add(player.getUsername());
+                }
+            });
+
+            grid.add(lv,0,0);
+            Button refreshBtn = new Button();
+            refreshBtn.setPrefSize(80,30);
+            refreshBtn.setText("Refresh");
+            refreshBtn.setOnAction(ee-> {
+                lv.getItems().clear();
+                game.handleCommand(new PlayerListCommand());
+                try{
+                    Thread.sleep(100);
+                }catch (InterruptedException we){}
+                for (Player player : game.getPlayerList()) {
+                    lv.getItems().add(player.getUsername());
+                }
+                });
+
+            grid.add(refreshBtn,0,1);
+            game.addStage(stage);
+            game.handleCommand(new PlayerListCommand());});
         return btn;
     }
 
