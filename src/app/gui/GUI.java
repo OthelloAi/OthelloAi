@@ -35,12 +35,13 @@ public class GUI extends BorderPane {
     private GameGUI gameGUI;
     Integer movePosition;
 
+    private Label leftStatus = new Label("Try to login. See File > Login");
+    private Label rightStatus = new Label("");
+
     public GUI(App app) {
         this.app = app;
         this.game = app.getGame();
         game.addGUI(this);
-
-
         render();
     }
 
@@ -61,16 +62,8 @@ public class GUI extends BorderPane {
                         menuAI()
                 );
             }
-
-
         } else {
-            MenuItem login = new MenuItem("Login");
-            login.setOnAction(e -> {
-                LoginDialog dialog = new LoginDialog();
-                Optional<String> result = dialog.showAndWait();
-                result.ifPresent(command -> CommandSender.addCommand(new LoginCommand(result.get())));
-            });
-            menuFile.getItems().add(login);
+            menuFile.getItems().add(menuItemLogin());
         }
         setTop(menuBar);
     }
@@ -80,11 +73,8 @@ public class GUI extends BorderPane {
     public void render() {
         Platform.runLater(() -> {
             createMenuBar();
-//            setBottom(getButtons());
-
-            setBottom(new Label("Try to log in.. see File > Login"));
+            createStatusBar();
             if (game.isLoggedIn()) {
-                setBottom(new Label("Welcome " + game.getLoggedInPlayer().getUsername()));
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     setCenter(gameGUI);
@@ -97,7 +87,14 @@ public class GUI extends BorderPane {
                     gameGUI.render();
                 }
             }
+
         });
+    }
+
+    private void createStatusBar() {
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(leftStatus, rightStatus);
+        setBottom(hBox);
     }
 
     private Menu menuActions() {
@@ -115,6 +112,19 @@ public class GUI extends BorderPane {
                 menuItemMoveAI()
         );
         return menu;
+    }
+
+    private MenuItem menuItemLogin() {
+        MenuItem item = new MenuItem("Login");
+        item.setOnAction(e -> {
+            LoginDialog dialog = new LoginDialog();
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(command -> {
+                CommandSender.addCommand(new LoginCommand(result.get()));
+                leftStatus.setText("Welcome " + command);
+            });
+        });
+        return item;
     }
 
     private MenuItem menuItemAllPlayers() {
@@ -211,9 +221,13 @@ public class GUI extends BorderPane {
             choices.add("Reversi");
             choices.add("Tic-tac-toe");
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
-
+            leftStatus.setText("Subscribing...");
             Optional<String> result = dialog.showAndWait();
-            result.ifPresent(gameType -> CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
+            result.ifPresent(gameType -> {
+                leftStatus.setText("Subscribed to " + gameType + ". Waiting for opponent..");
+                CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
+            });
+
 
         });
         return item;
