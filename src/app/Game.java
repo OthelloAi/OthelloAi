@@ -104,6 +104,7 @@ public class Game extends Application implements Protocol {
     }
 
 
+
     public ArrayList<Challenge> getPendingChallenges() {return pendingChallenges;}
 
     @Override
@@ -176,6 +177,10 @@ public class Game extends Application implements Protocol {
         for (int i = 0; i < stages.size(); i++) {
             stages.get(i).close();
         }
+    }
+
+    public void addStage(Stage stage) {
+        stages.add(stage);
     }
 
     public void setLogin(boolean loggedIn) {
