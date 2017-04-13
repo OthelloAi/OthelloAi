@@ -36,6 +36,7 @@ public class GUI extends BorderPane {
     private Game game;
     private GameGUI gameGUI;
     Integer movePosition;
+    Label scoreLabel;// = "Your score: 0, Opponents score: 0";
 
     public GUI(Game game) {
         this.game = game;
@@ -151,7 +152,8 @@ public class GUI extends BorderPane {
             LoginDialog dialog = new LoginDialog();
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(command -> game.handleCommand(new LoginCommand(result.get())));
-            ;});
+            scoreLabel.setText("Your score: 0              vs               Opponents score: 0");
+        });
 
         return btn;
     }
@@ -233,9 +235,9 @@ public class GUI extends BorderPane {
     }
 
     private Label getScoreLabel(){
-        Label label = new Label();
-        label.setText("You're score: ");
-        return label;
+        scoreLabel = new Label();
+        scoreLabel.setText("You're score: ");
+        return scoreLabel;
     }
 
     private Button getGameListButton() {
