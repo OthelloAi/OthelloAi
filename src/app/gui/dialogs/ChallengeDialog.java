@@ -1,10 +1,10 @@
 package app.gui.dialogs;
 
-import app.Game;
-import app.Player;
-import app.commands.PlayerListCommand;
+import app.game.Game;
+import app.game.Player;
+import app.network.CommandSender;
+import app.network.commands.PlayerListCommand;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
@@ -24,10 +24,12 @@ public class ChallengeDialog extends Dialog {
     }
 
     public Optional<Pair<String, String>> display() {
-        game.handleCommand(new PlayerListCommand());
+        CommandSender.addCommand(new PlayerListCommand());
+
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {}
+
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Challenge Dialog");
 

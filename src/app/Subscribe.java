@@ -1,5 +1,7 @@
 package app;
 
+import app.game.GameType;
+
 /**
  * @author Joël Hoekstra
  */
