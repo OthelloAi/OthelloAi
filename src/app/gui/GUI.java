@@ -14,8 +14,7 @@ import app.utils.Config;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import app.network.commands.*;
@@ -23,13 +22,14 @@ import java.util.Optional;
 import java.util.ArrayList;
 import javafx.scene.layout.*;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
 import javafx.application.Platform;
 
 /**
  * @author Joël Hoekstra
  */
 public class GUI extends BorderPane {
+
+    private MenuBar menuBar;
     private Game game;
     private App app;
     private GameGUI gameGUI;
@@ -41,16 +41,51 @@ public class GUI extends BorderPane {
         this.game = app.getGame();
         game.addGUI(this);
 
-        setTop(getLabels());
-        setBottom(getButtons());
+
         render();
     }
 
-    public void render() {
+    private void createMenuBar() {
+        menuBar = new MenuBar();
+        Menu menuFile = new Menu("File");
+        menuBar.getMenus().add(menuFile);
         if (game.isLoggedIn()) {
+            menuFile.getItems().addAll(
+                    menuItemSubscribe(),
+                    menuItemAllPlayers(),
+                    menuItemChallenge(),
+                    menuItemLogout()
+            );
+            if (game.isInMatch()) {
+                menuBar.getMenus().addAll(
+                        menuActions(),
+                        menuAI()
+                );
+            }
 
-//            System.out.println("board: " + game.getBoard());
-            Platform.runLater(() -> {
+
+        } else {
+            MenuItem login = new MenuItem("Login");
+            login.setOnAction(e -> {
+                LoginDialog dialog = new LoginDialog();
+                Optional<String> result = dialog.showAndWait();
+                result.ifPresent(command -> CommandSender.addCommand(new LoginCommand(result.get())));
+            });
+            menuFile.getItems().add(login);
+        }
+        setTop(menuBar);
+    }
+
+
+
+    public void render() {
+        Platform.runLater(() -> {
+            createMenuBar();
+//            setBottom(getButtons());
+
+            setBottom(new Label("Try to log in.. see File > Login"));
+            if (game.isLoggedIn()) {
+                setBottom(new Label("Welcome " + game.getLoggedInPlayer().getUsername()));
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     setCenter(gameGUI);
@@ -62,8 +97,8 @@ public class GUI extends BorderPane {
                 if (gameGUI != null) {
                     gameGUI.render();
                 }
-            });
-        }
+            }
+        });
     }
 
     private HBox getLabels() {
@@ -74,108 +109,42 @@ public class GUI extends BorderPane {
         return hBox;
     }
 
-    private HBox getButtons() {
-        HBox hBox = new HBox();
-        hBox.getChildren().addAll(
-                getLoginButton(),
-                getSubscribeButton(),
-                getChallengeButton(),
-                getPlayerListButton(),
-                getForfeitButton(),
-                getAllPlayersButton(),
-                getMoveButton(),
-                getAiButton(),
-                getLogoutButton()
+//    private HBox getButtons() {
+//        HBox hBox = new HBox();
+//        hBox.getChildren().addAll(
+//                getLoginButton(),
+//                getSubscribeButton(),
+//                getChallengeButton(),
+//                getPlayerListButton(),
+//                getForfeitButton(),
+//                getAllPlayersButton(),
+//                getMoveButton(),
+//                getAiButton(),
+//                getLogoutButton()
+//        );
+//        return hBox;
+//    }
+
+    private Menu menuActions() {
+        Menu menu = new Menu("Actions");
+        menu.getItems().addAll(
+                menuItemForfeit(),
+                menuItemMove()
         );
-        return hBox;
+        return menu;
     }
 
-    private Button getAiButton() {
-        Button btn = new Button("AI");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> {
-            int position = game.getActor().getNext(game.getPossibleMoves());
-            Move move = new Move(position, game.getLoggedInPlayer());
-            CommandSender.addCommand(new MoveCommand(move));
-        });
-        return btn;
+    private Menu menuAI() {
+        Menu menu = new Menu("AI");
+        menu.getItems().add(
+                menuItemMoveAI()
+        );
+        return menu;
     }
 
-    private Button getMoveButton() {
-        Button btn = new Button("Move");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> {
-            MoveDialog dialog = new MoveDialog();
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(movePosition -> {
-                this.movePosition = Integer.parseInt(movePosition);
-                System.out.println(this.movePosition);
-                game.handleMove(this.movePosition);
-            });
-        });
-        return btn;
-    }
-
-    private Button getChallengeButton() {
-        Button btn = new Button("Challenge");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> {
-            ChallengeDialog dialog = new ChallengeDialog(game);
-            Optional<Pair<String, String>> result = dialog.display();
-            result.ifPresent(command -> {
-                CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
-            });
-        });
-        return btn;
-    }
-
-    private Button getSubscribeButton() {
-        Button btn = new Button("Subscribe");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> {
-            List<String> choices = new ArrayList<>();
-            choices.add("Reversi");
-            choices.add("Tic-tac-toe");
-            SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
-
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(gameType -> CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
-
-        });
-        return btn;
-    }
-
-    private Button getLoginButton() {
-        Button btn = new Button("Login");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> {
-            LoginDialog dialog = new LoginDialog();
-            Optional<String> result = dialog.showAndWait();
-            result.ifPresent(command -> CommandSender.addCommand(new LoginCommand(result.get())));
-            scoreLabel.setText("Your score: 0              vs               Opponents score: 0"); // TODO: 13/04/2017 refactor to someplace else 
-        });
-
-        return btn;
-    }
-
-    private Button getLogoutButton() {
-        Button btn = new Button("Logout");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction((ActionEvent e) -> {
-            CommandSender.addCommand(new LogoutCommand());
-            try {
-                app.stop();
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
-        });
-        return btn;
-    }
-
-    private Button getAllPlayersButton() {
-        Button btn = new Button("Show all players");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
+    private MenuItem menuItemAllPlayers() {
+        MenuItem item = new MenuItem("Show Players");
+        item.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
 
             Stage stage = new Stage();
 
@@ -209,30 +178,224 @@ public class GUI extends BorderPane {
                 for (Player player : game.getPlayerList()) {
                     lv.getItems().add(player.getUsername());
                 }
-                });
+            });
 
             grid.add(refreshBtn,0,1);
             game.addStage(stage);
-            CommandSender.addCommand(new PlayerListCommand());});
-        return btn;
+            CommandSender.addCommand(new PlayerListCommand());
+        });
+        return item;
     }
 
-    private Button getPlayerListButton() {
-        Button btn = new Button("Get Playerlist");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> CommandSender.addCommand(new PlayerListCommand()));
-        return btn;
+    private MenuItem menuItemMove() {
+        MenuItem item = new MenuItem("Move");
+        item.setOnAction(e -> {
+            MoveDialog dialog = new MoveDialog();
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(movePosition -> {
+                this.movePosition = Integer.parseInt(movePosition);
+                game.handleMove(this.movePosition);
+            });
+        });
+        return item;
     }
-  
-    private Button getPendingChallenges(){
-        Button btn = new Button("Get pending challenges");
-        btn.setPrefSize(80,30);
-        btn.setOnAction(e-> {
-            ArrayList<Challenge> challenges = game.getPendingChallenges();
+
+    private MenuItem menuItemMoveAI() {
+        MenuItem item = new MenuItem("Do Move");
+        item.setOnAction(e -> {
+            int position = game.getActor().getNext(game.getPossibleMoves());
+            Move move = new Move(position, game.getLoggedInPlayer());
+            CommandSender.addCommand(new MoveCommand(move));
+        });
+        return item;
+    }
+
+    private MenuItem menuItemForfeit() {
+        MenuItem item = new MenuItem("Forfeit");
+        item.setOnAction(e -> {
+            CommandSender.addCommand(new ForfeitCommand());
+        });
+        return item;
+    }
+
+    private MenuItem menuItemChallenge() {
+        MenuItem item = new MenuItem("Challenge Player");
+        item.setOnAction(e -> {
+            ChallengeDialog dialog = new ChallengeDialog(game);
+            Optional<Pair<String, String>> result = dialog.display();
+            result.ifPresent(command -> {
+                CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
+            });
+        });
+        return item;
+    }
+    private MenuItem menuItemSubscribe() {
+        MenuItem item = new MenuItem("Subscribe");
+        item.setOnAction(e -> {
+            List<String> choices = new ArrayList<>();
+            choices.add("Reversi");
+            choices.add("Tic-tac-toe");
+            SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
+
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(gameType -> CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
 
         });
-        return btn;
+        return item;
     }
+
+    private MenuItem menuItemLogout() {
+        MenuItem item = new MenuItem("Logout");
+        item.setOnAction(e -> app.stop());
+        return item;
+    }
+
+
+
+
+//    private Button getAiButton() {
+//        Button btn = new Button("AI");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> {
+//            int position = game.getActor().getNext(game.getPossibleMoves());
+//            Move move = new Move(position, game.getLoggedInPlayer());
+//            CommandSender.addCommand(new MoveCommand(move));
+//        });
+//        return btn;
+//    }
+//
+//    private Button getMoveButton() {
+//        Button btn = new Button("Move");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> {
+//            MoveDialog dialog = new MoveDialog();
+//            Optional<String> result = dialog.showAndWait();
+//            result.ifPresent(movePosition -> {
+//                this.movePosition = Integer.parseInt(movePosition);
+//                System.out.println(this.movePosition);
+//                game.handleMove(this.movePosition);
+//            });
+//        });
+//        return btn;
+//    }
+
+//    private Button getChallengeButton() {
+//        Button btn = new Button("Challenge");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> {
+//            ChallengeDialog dialog = new ChallengeDialog(game);
+//            Optional<Pair<String, String>> result = dialog.display();
+//            result.ifPresent(command -> {
+//                CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
+//            });
+//        });
+//        return btn;
+//    }
+
+//    private Button getSubscribeButton() {
+//        Button btn = new Button("Subscribe");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> {
+//            List<String> choices = new ArrayList<>();
+//            choices.add("Reversi");
+//            choices.add("Tic-tac-toe");
+//            SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
+//
+//            Optional<String> result = dialog.showAndWait();
+//            result.ifPresent(gameType -> CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
+//
+//        });
+//        return btn;
+//    }
+
+//    private Button getLoginButton() {
+//        Button btn = new Button("Login");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> {
+//            LoginDialog dialog = new LoginDialog();
+//            Optional<String> result = dialog.showAndWait();
+//            result.ifPresent(command -> CommandSender.addCommand(new LoginCommand(result.get())));
+//            scoreLabel.setText("Your score: 0              vs               Opponents score: 0"); // TODO: 13/04/2017 refactor to someplace else
+//        });
+//
+//        return btn;
+//    }
+
+//    private Button getLogoutButton() {
+//        Button btn = new Button("Logout");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction((ActionEvent e) -> {
+//            CommandSender.addCommand(new LogoutCommand());
+//            try {
+//                app.stop();
+//            } catch (Exception e1) {
+//                e1.printStackTrace();
+//            }
+//        });
+//        return btn;
+//    }
+
+//    private Button getAllPlayersButton() {
+//        Button btn = new Button("Show all players");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
+//
+//            Stage stage = new Stage();
+//
+//            GridPane grid = new GridPane();
+//            grid.setAlignment(Pos.CENTER);
+//            grid.setHgap(10);
+//            grid.setVgap(10);
+//            grid.setPadding(new Insets(25, 25, 25, 25));
+//            Scene scene = new Scene(grid, 300, 300);
+//            stage.setScene(scene);
+//            stage.setTitle("All players");
+//            stage.show();
+//
+//            ListView lv = new ListView();
+//            Platform.runLater(() -> {
+//                for (Player player : game.getPlayerList()) {
+//                    lv.getItems().add(player.getUsername());
+//                }
+//            });
+//
+//            grid.add(lv,0,0);
+//            Button refreshBtn = new Button();
+//            refreshBtn.setPrefSize(80,30);
+//            refreshBtn.setText("Refresh");
+//            refreshBtn.setOnAction(ee-> {
+//                lv.getItems().clear();
+//                CommandSender.addCommand(new PlayerListCommand());
+//                try{
+//                    Thread.sleep(100);
+//                }catch (InterruptedException we){}
+//                for (Player player : game.getPlayerList()) {
+//                    lv.getItems().add(player.getUsername());
+//                }
+//                });
+//
+//            grid.add(refreshBtn,0,1);
+//            game.addStage(stage);
+//            CommandSender.addCommand(new PlayerListCommand());});
+//        return btn;
+//    }
+
+//    private Button getPlayerListButton() {
+//        Button btn = new Button("Get Playerlist");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> CommandSender.addCommand(new PlayerListCommand()));
+//        return btn;
+//    }
+  
+//    private Button getPendingChallenges(){
+//        Button btn = new Button("Get pending challenges");
+//        btn.setPrefSize(80,30);
+//        btn.setOnAction(e-> {
+//            ArrayList<Challenge> challenges = game.getPendingChallenges();
+//
+//        });
+//        return btn;
+//    }
 
     private Label getScoreLabel(){
         scoreLabel = new Label();
@@ -240,19 +403,19 @@ public class GUI extends BorderPane {
         return scoreLabel;
     }
 
-    private Button getGameListButton() {
-        Button btn = new Button("games");
-        btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> CommandSender.addCommand(new GameListCommand()));
-        return btn;
-    }
+//    private Button getGameListButton() {
+//        Button btn = new Button("games");
+//        btn.setPrefSize(80, 30);
+//        btn.setOnAction(e -> CommandSender.addCommand(new GameListCommand()));
+//        return btn;
+//    }
 
-    private Button getForfeitButton(){
-        Button btn = new Button("Forfeit");
-        btn.setPrefSize(80,30);
-        btn.setOnAction(e -> CommandSender.addCommand(new ForfeitCommand()));
-        return btn;
-    }
+//    private Button getForfeitButton(){
+//        Button btn = new Button("Forfeit");
+//        btn.setPrefSize(80,30);
+//        btn.setOnAction(e -> CommandSender.addCommand(new ForfeitCommand()));
+//        return btn;
+//    }
   
     public void reset() {
         gameGUI = null;

@@ -6,6 +6,7 @@ import app.gui.alerts.CouldNotConnectAlert;
 import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
 import app.network.Connection;
+import app.network.commands.LogoutCommand;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -102,6 +103,7 @@ public class App extends Application {
 
     @Override
     public void stop() {
+        CommandSender.addCommand(new LogoutCommand());
         for (Stage stage : stages) {
             stage.close();
         }
