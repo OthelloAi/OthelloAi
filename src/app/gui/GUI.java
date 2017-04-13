@@ -33,7 +33,7 @@ public class GUI extends BorderPane {
     private Game game;
     private App app;
     private GameGUI gameGUI;
-    Integer movePosition;
+    private Integer movePosition;
 
     private Label leftStatus = new Label("Try to login. See File > Login");
     private Label rightStatus = new Label("");
@@ -68,8 +68,6 @@ public class GUI extends BorderPane {
         setTop(menuBar);
     }
 
-
-
     public void render() {
         Platform.runLater(() -> {
             createMenuBar();
@@ -87,7 +85,6 @@ public class GUI extends BorderPane {
                     gameGUI.render();
                 }
             }
-
         });
     }
 
@@ -227,8 +224,6 @@ public class GUI extends BorderPane {
                 leftStatus.setText("Subscribed to " + gameType + ". Waiting for opponent..");
                 CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
             });
-
-
         });
         return item;
     }
