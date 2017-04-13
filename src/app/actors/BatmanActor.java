@@ -1,6 +1,5 @@
 package app.actors;
 
-import app.Move;
 import app.batman.*;
 import java.util.ArrayList;
 
@@ -13,11 +12,7 @@ public class BatmanActor implements Actor {
 
     public BatmanActor() {
         Batman batman = new Batman();
-    }
-
-    @Override
-    public Move getNextMove(ArrayList<Move> possibleMoves) {
-        return possibleMoves.get(0);
+        System.out.println(batman.toString());
     }
 
     @Override

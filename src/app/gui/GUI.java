@@ -2,24 +2,23 @@ package app.gui;
 
 import app.*;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseListener;
 import java.util.List;
 
-import app.actors.Actor;
-import app.actors.IterativeActor;
-import app.actors.RandomActor;
+import app.game.Game;
+import app.game.GameType;
+import app.game.Move;
+import app.game.Player;
 import app.gui.dialogs.*;
+import app.network.CommandSender;
+import app.utils.Config;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import app.commands.*;
+import app.network.commands.*;
 import java.util.Optional;
 import java.util.ArrayList;
 import javafx.scene.layout.*;
@@ -27,29 +26,30 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.application.Platform;
 
-import static com.sun.java.accessibility.util.AWTEventMonitor.addMouseListener;
-
 /**
  * @author Joël Hoekstra
  */
 public class GUI extends BorderPane {
     private Game game;
+    private App app;
     private GameGUI gameGUI;
     Integer movePosition;
     Label scoreLabel;// = "Your score: 0, Opponents score: 0";
 
-    public GUI(Game game) {
-        this.game = game;
+    public GUI(App app) {
+        this.app = app;
+        this.game = app.getGame();
+        game.addGUI(this);
+
         setTop(getLabels());
         setBottom(getButtons());
         render();
-
     }
 
     public void render() {
         if (game.isLoggedIn()) {
 
-            System.out.println("board: " + game.getBoard());
+//            System.out.println("board: " + game.getBoard());
             Platform.runLater(() -> {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
@@ -96,7 +96,7 @@ public class GUI extends BorderPane {
         btn.setOnAction(e -> {
             int position = game.getActor().getNext(game.getPossibleMoves());
             Move move = new Move(position, game.getLoggedInPlayer());
-            game.handleCommand(new MoveCommand(move));
+            CommandSender.addCommand(new MoveCommand(move));
         });
         return btn;
     }
@@ -123,7 +123,7 @@ public class GUI extends BorderPane {
             ChallengeDialog dialog = new ChallengeDialog(game);
             Optional<Pair<String, String>> result = dialog.display();
             result.ifPresent(command -> {
-                game.handleCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
+                CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
             });
         });
         return btn;
@@ -139,7 +139,7 @@ public class GUI extends BorderPane {
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
 
             Optional<String> result = dialog.showAndWait();
-            result.ifPresent(gameType -> game.handleCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
+            result.ifPresent(gameType -> CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType))));
 
         });
         return btn;
@@ -151,8 +151,8 @@ public class GUI extends BorderPane {
         btn.setOnAction(e -> {
             LoginDialog dialog = new LoginDialog();
             Optional<String> result = dialog.showAndWait();
-            result.ifPresent(command -> game.handleCommand(new LoginCommand(result.get())));
-            scoreLabel.setText("Your score: 0              vs               Opponents score: 0");
+            result.ifPresent(command -> CommandSender.addCommand(new LoginCommand(result.get())));
+            scoreLabel.setText("Your score: 0              vs               Opponents score: 0"); // TODO: 13/04/2017 refactor to someplace else 
         });
 
         return btn;
@@ -162,9 +162,9 @@ public class GUI extends BorderPane {
         Button btn = new Button("Logout");
         btn.setPrefSize(80, 30);
         btn.setOnAction((ActionEvent e) -> {
-            game.handleCommand(new LogoutCommand());
+            CommandSender.addCommand(new LogoutCommand());
             try {
-                game.stop();
+                app.stop();
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -202,7 +202,7 @@ public class GUI extends BorderPane {
             refreshBtn.setText("Refresh");
             refreshBtn.setOnAction(ee-> {
                 lv.getItems().clear();
-                game.handleCommand(new PlayerListCommand());
+                CommandSender.addCommand(new PlayerListCommand());
                 try{
                     Thread.sleep(100);
                 }catch (InterruptedException we){}
@@ -213,14 +213,14 @@ public class GUI extends BorderPane {
 
             grid.add(refreshBtn,0,1);
             game.addStage(stage);
-            game.handleCommand(new PlayerListCommand());});
+            CommandSender.addCommand(new PlayerListCommand());});
         return btn;
     }
 
     private Button getPlayerListButton() {
         Button btn = new Button("Get Playerlist");
         btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> game.handleCommand(new PlayerListCommand()));
+        btn.setOnAction(e -> CommandSender.addCommand(new PlayerListCommand()));
         return btn;
     }
   
@@ -243,14 +243,14 @@ public class GUI extends BorderPane {
     private Button getGameListButton() {
         Button btn = new Button("games");
         btn.setPrefSize(80, 30);
-        btn.setOnAction(e -> game.handleCommand(new GameListCommand()));
+        btn.setOnAction(e -> CommandSender.addCommand(new GameListCommand()));
         return btn;
     }
 
     private Button getForfeitButton(){
         Button btn = new Button("Forfeit");
         btn.setPrefSize(80,30);
-        btn.setOnAction(e -> game.handleCommand(new ForfeitCommand()));
+        btn.setOnAction(e -> CommandSender.addCommand(new ForfeitCommand()));
         return btn;
     }
   

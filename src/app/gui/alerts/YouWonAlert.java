@@ -1,6 +1,5 @@
 package app.gui.alerts;
 
-import app.Game;
 import javafx.scene.control.Alert;
 
 /**
