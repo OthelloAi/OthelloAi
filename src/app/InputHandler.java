@@ -135,7 +135,8 @@ public class InputHandler implements Runnable {
         } else if (responseString.startsWith("ERR")) {
             Command errorResponseTo = sender.getOldestSentCommand();
             System.err.println("[SVR] Error occurred to command: '" + errorResponseTo.toString() + "'");
-            return handleErrorResponse(errorResponseTo);
+            return handleErrorResponse(errorResponseTo, responseString);
+//            if (responseString.startsWith("DUPLICATE NAME"))
         }
         return new NullResponse();
     }
@@ -157,11 +158,12 @@ public class InputHandler implements Runnable {
         return response;
     }
 
-    private Response handleErrorResponse(Command command) {
+    private Response handleErrorResponse(Command command, String responseString) {
         Response response = null;
-        if (command instanceof LoginCommand) {
-            response = new AlreadyLoggedInResponse(game);
-        }
+//        if (command instanceof LoginCommand) {
+//            response = new AlreadyLoggedInResponse(game);
+//        }
+        response = new ErrorResponse(game, responseString);
         return response;
     }
 

@@ -24,6 +24,10 @@ public class ChallengeDialog extends Dialog {
     }
 
     public Optional<Pair<String, String>> display() {
+        game.handleCommand(new PlayerListCommand());
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {}
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Challenge Dialog");
 

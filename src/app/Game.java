@@ -20,8 +20,6 @@ import org.omg.PortableInterceptor.INACTIVE;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Random;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +41,6 @@ public class Game extends Application implements Protocol {
     private String hostName = SERVER_HOST;
     private int portNumber = SERVER_PORT;
 
-    CountDownLatch latch = new CountDownLatch(1);
     private Actor actor;
     private Match match = null;
 
@@ -126,12 +123,10 @@ public class Game extends Application implements Protocol {
             }
         }
         stages.add(stage);
-        sender = new CommandSender(this, latch, connection.getSocket());
+        sender = new CommandSender(this, connection.getSocket());
         commandSenderThread = new Thread(sender);
         commandSenderThread.setDaemon(true);
         commandSenderThread.start();
-
-        askLoginName();
 
         gui = new GUI(this);
         Scene scene = new Scene(gui, 800, 600);
@@ -141,19 +136,6 @@ public class Game extends Application implements Protocol {
         stage.setY(0);
         stage.show();
         stage.setOnCloseRequest(e -> stop());
-
-        try {
-            // Wait for CommandSenderThread to connect to server
-            if (latch.await(2, TimeUnit.SECONDS)) {
-                // Show the GUI
-                stage.show();
-            } else {
-                System.exit(0);
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     public boolean askConnectionInfo() {
@@ -188,32 +170,6 @@ public class Game extends Application implements Protocol {
         }
         return false;
     }
-
-    public void askLoginName() {
-        try {
-            // Wait for commandSenderThread to connect to server
-            if (latch.await(2, TimeUnit.SECONDS)) {
-                // Create a new Dialog asking for login name
-                LoginDialog dialog = new LoginDialog();
-                Optional<String> loginResult = dialog.showAndWait();
-                loginResult.ifPresent(command -> this.handleCommand(new LoginCommand(loginResult.get())));
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-//        if (sender.isConnected && showFrame) {
-//            gui = new GUI(this);
-//            Scene scene = new Scene(gui, 800, 600);
-//            stage.setTitle("Two player game");
-//            stage.setScene(scene);
-//            stage.setX(0);
-//            stage.setY(0);
-//            stage.setOnCloseRequest(e -> stop());
-//            stage.show();
-//        } else {
-////            System.exit(0);
 
     @Override
     public void stop() {
@@ -337,6 +293,4 @@ public class Game extends Application implements Protocol {
     public void update() {
         gui.update();
     }
-
-
 }

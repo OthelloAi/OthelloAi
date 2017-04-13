@@ -18,6 +18,9 @@ public class LoginSuccessResponse implements Response {
 
     @Override
     public void handle() {
+        if (game == null) {
+            return;
+        }
         game.setLogin(true);
         game.setLoggedInPlayer(player);
     }
