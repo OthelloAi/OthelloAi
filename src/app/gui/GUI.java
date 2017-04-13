@@ -12,7 +12,9 @@ import app.actors.RandomActor;
 import app.gui.dialogs.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
@@ -37,6 +39,7 @@ public class GUI extends BorderPane {
 
     public GUI(Game game) {
         this.game = game;
+        setTop(getLabels());
         setBottom(getButtons());
         render();
 
@@ -44,6 +47,7 @@ public class GUI extends BorderPane {
 
     public void render() {
         if (game.isLoggedIn()) {
+
             System.out.println("board: " + game.getBoard());
             Platform.runLater(() -> {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
@@ -59,6 +63,14 @@ public class GUI extends BorderPane {
                 }
             });
         }
+    }
+
+    private HBox getLabels() {
+        HBox hBox = new HBox();
+        hBox.getChildren().addAll(
+                getScoreLabel()
+        );
+        return hBox;
     }
 
     private HBox getButtons() {
@@ -139,7 +151,8 @@ public class GUI extends BorderPane {
             LoginDialog dialog = new LoginDialog();
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(command -> game.handleCommand(new LoginCommand(result.get())));
-        });
+            ;});
+
         return btn;
     }
 
@@ -217,6 +230,12 @@ public class GUI extends BorderPane {
 
         });
         return btn;
+    }
+
+    private Label getScoreLabel(){
+        Label label = new Label();
+        label.setText("You're score: ");
+        return label;
     }
 
     private Button getGameListButton() {
