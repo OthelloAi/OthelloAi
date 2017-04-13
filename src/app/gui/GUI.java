@@ -15,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import app.network.commands.*;
@@ -26,6 +27,7 @@ import javafx.application.Platform;
 
 /**
  * @author Joël Hoekstra
+ * @author Robert Zandberg
  */
 public class GUI extends BorderPane {
 
@@ -33,8 +35,6 @@ public class GUI extends BorderPane {
     private Game game;
     private App app;
     private GameGUI gameGUI;
-    private Integer movePosition;
-
     private Label leftStatus = new Label("Try to login. See File > Login");
     private Label rightStatus = new Label("");
 
@@ -87,7 +87,6 @@ public class GUI extends BorderPane {
             }
         });
     }
-
     private void createStatusBar() {
         HBox hBox = new HBox();
         hBox.getChildren().addAll(leftStatus, rightStatus);
@@ -127,7 +126,6 @@ public class GUI extends BorderPane {
     private MenuItem menuItemAllPlayers() {
         MenuItem item = new MenuItem("Show Players");
         item.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
-
             Stage stage = new Stage();
 
             GridPane grid = new GridPane();
@@ -211,6 +209,7 @@ public class GUI extends BorderPane {
         });
         return item;
     }
+                              
     private MenuItem menuItemSubscribe() {
         MenuItem item = new MenuItem("Subscribe");
         item.setOnAction(e -> {
