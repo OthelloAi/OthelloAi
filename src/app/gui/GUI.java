@@ -173,8 +173,8 @@ public class GUI extends BorderPane {
             MoveDialog dialog = new MoveDialog();
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(movePosition -> {
-                this.movePosition = Integer.parseInt(movePosition);
-                game.handleMove(this.movePosition);
+//                this.movePosition = Integer.parseInt(movePosition);
+                game.handleMove(Integer.parseInt(movePosition));
             });
         });
         return item;
