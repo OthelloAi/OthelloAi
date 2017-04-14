@@ -1,5 +1,6 @@
 package app.network.responses;
 
+import app.App;
 import app.Challenge;
 import app.game.GameType;
 import app.utils.Config;
@@ -12,30 +13,26 @@ import java.util.Map;
  */
 public class ChallengeResponse implements Response {
 
-    private Game game;
+    private App app;
     private Map<String, String> params;
     private Challenge challenge;
 
-    public ChallengeResponse(Game game, Map<String, String> params) {
+    public ChallengeResponse(App app, Map<String, String> params) {
         this.params = params;
-        this.game = game;
+        this.app = app;
         this.challenge = new Challenge(
                 params.get("CHALLENGER"),
                 Config.getGameTypeFromName(params.get("GAMETYPE"))
         );
         this.challenge.setId(Integer.parseInt(params.get("CHALLENGENUMBER")));
     }
-
-    public ChallengeResponse(Game game, String challenger, GameType gameType, int id) {
-        this.game = game;
-        this.challenge = new Challenge(challenger, gameType);
-    }
     
     @Override
     public void handle() {
 //        Challenge challenge = new Challenge(params.get("CHALLENGER"), Config.getGameTypeFromName(params.get("GAMETYPE")));
 //        challenge.setId(Integer.parseInt(params.get("CHALLENGENUMBER")));
-        game.addPendingChallenge(challenge);
+        app.getGame().addPendingChallenge(challenge);
+        // TODO: 14/04/2017 how can this be improved?
         System.out.println("challenge has been send");
     }
 }

@@ -1,5 +1,8 @@
 package app.network.responses;
 
+import app.App;
+import app.Match;
+import app.game.EndState;
 import app.game.Game;
 import app.gui.alerts.DrawGameAlert;
 import javafx.application.Platform;
@@ -12,15 +15,19 @@ import java.util.Map;
  */
 public class GameDrawResponse implements Response {
     private Map<String, String> params;
-    private Game game;
+    private App app;
 
-    public GameDrawResponse(Game game, Map<String, String> params) {
-        this.game = game;
+    public GameDrawResponse(App app, Map<String, String> params) {
+        this.app = app;
         this.params = params;
     }
 
     @Override
     public void handle() {
+        Match match = app.getGame().endMatch(EndState.DRAW);
+//        PLAYERONESCORE
+        // PLAYERTWOSCORE
+        // COMMENT
         Platform.runLater(() -> {
             Alert alert = new DrawGameAlert();
             alert.showAndWait();

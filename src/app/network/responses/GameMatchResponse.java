@@ -1,5 +1,6 @@
 package app.network.responses;
 
+import app.App;
 import app.utils.Config;
 import app.game.Game;
 import app.game.Player;
@@ -11,17 +12,17 @@ import java.util.Map;
  */
 public class GameMatchResponse implements Response {
 
-    private Game game;
+    private App app;
     private Map<String, String> params;
 
-    public GameMatchResponse(Game game, Map<String, String> params) {
-        this.game = game;
+    public GameMatchResponse(App app, Map<String, String> params) {
+        this.app = app;
         this.params = params;
     }
     @Override
     public void handle() {
         Player opponent = new Player(params.get("OPPONENT"));
-        Player loggedInPlayer = game.getLoggedInPlayer();
+        Player loggedInPlayer = app.getUser();
         Player playerOne;
         Player playerTwo;
         if (params.get("PLAYERTOMOVE").equals(loggedInPlayer.getUsername())) {
@@ -31,9 +32,10 @@ public class GameMatchResponse implements Response {
             playerOne = opponent;
             playerTwo = loggedInPlayer;
         }
-        game.startMatch(
+        app.getGame().startMatch(
                 playerOne,
                 playerTwo,
                 Config.getGameTypeFromName(params.get("GAMETYPE")));
+
     }
 }

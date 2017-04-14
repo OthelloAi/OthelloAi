@@ -27,25 +27,21 @@ import java.util.regex.Pattern;
 /**
  * @author Joël Hoekstra
  */
-public class Game {// implements Protocol {
-//    private CommandSender sender;
-//    private Random rand;
+public class Game {
     private GUI gui;
-    private boolean loggedIn;
     private Board board;
     private GameType gameType;
-    private Player loggedInPlayer;
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
-    private ArrayList<Stage> stages = new ArrayList<>();
 
     private Actor actor;
     private Match match = null;
+    private App app;
 
-    public Game() {
+
+    public Game(App app) {
+        this.app = app;
         pendingChallenges = new ArrayList<>();
-//        rand = new Random();
-        loggedIn = false;
         board = new Board(gameType);
         actor = new MiniMaxActor(this, board);
     }
@@ -68,12 +64,8 @@ public class Game {// implements Protocol {
         gui.render();
     }
 
-    public void setLoggedInPlayer(Player player) {
-        loggedInPlayer = player;
-    }
-
     public Player getLoggedInPlayer() {
-        return loggedInPlayer;
+        return app.getUser();
     }
 
     public boolean isInMatch() {
@@ -106,18 +98,11 @@ public class Game {// implements Protocol {
             }
         });
     }
-
-
-
-    public ArrayList<Challenge> getPendingChallenges() {return pendingChallenges;}
-
-    public void addStage(Stage stage) {
-        stages.add(stage);
-    }
-
-    public void setLogin(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-        update();
+    
+    public Match endMatch(EndState endState) {
+        // TODO: 14/04/2017 add functionality for ending a game here
+//        match.stop();
+        return match;
     }
 
     public ArrayList<Integer> getPossibleMoves() {
@@ -125,7 +110,7 @@ public class Game {// implements Protocol {
     }
 
     public boolean isLoggedIn() {
-        return (loggedInPlayer != null);
+        return (app.getUser() != null);
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
@@ -134,22 +119,21 @@ public class Game {// implements Protocol {
             StartMatchAlert startMatchAlert = new StartMatchAlert();
             startMatchAlert.showAndWait();
         });
-
-        board = new Board(gameType);
+        setGameType(gameType);
+//        board = new Board(gameType); // TODO: 14/04/2017 create unique board types for tic tac toe and for reversi
         gui.reset();
         match = new Match(gameType, playerOne, playerTwo);
+        match.start();
+        update();
         gui.setLeftStatusText("You have been placed in a new match. Good luck!");
     }
 
     public void placeMove(Move move) {
         if (isLoggedIn()) {
-            if (isInMatch()) {
+            if (match.canDoMove()) {
                 match.addMove(move);
-                board.addMove(move.getPosition(), getTokenByPlayer(move.getPlayer()));
-                if (gameType == GameType.REVERSI) {
-                    board.flipColors(move, getTokenByPlayer(move.getPlayer()));
-                }
-                gui.update();
+                board.addMove(move.getPosition(), match.getTokenByPlayer(move.getPlayer()));
+                update();
             }
         }
         else {
@@ -159,12 +143,13 @@ public class Game {// implements Protocol {
     }
     
     public void forfeit() {
-        // TODO: 14/04/2017 handle forfeit
+        match.forfeit();
+        update();
     }
 
     public void handleMove(Integer movePosition){
-        Move move = new Move(movePosition, getLoggedInPlayer());
-        if(board.isValidMove(move, getTokenByPlayer(move.getPlayer())))
+        Move move = new Move(movePosition, app.getUser());
+        if(board.isValidMove(move, match.getTokenByPlayer(move.getPlayer())))
         {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
@@ -181,22 +166,6 @@ public class Game {// implements Protocol {
                     alert.showAndWait();
                 });
             }
-    }
-
-    private Token getTokenByPlayer(Player player) {
-        if (match != null) {
-            System.out.println("Token for player: " + player.getUsername());
-            if (player.getUsername().equals(match.getPlayerOne().getUsername())) {
-                if (gameType == GameType.REVERSI) return new Token(TokenState.BLACK);
-                if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.CROSS);
-            }
-
-            if (player.getUsername().equals(match.getPlayerTwo().getUsername())) {
-                if (gameType == GameType.REVERSI) return new Token(TokenState.WHITE);
-                if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.NOUGHT);
-            }
-        }
-        return new Token(TokenState.EMPTY);
     }
 
     public void update() {

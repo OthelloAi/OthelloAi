@@ -1,5 +1,6 @@
 package app.network.responses;
 
+import app.App;
 import app.game.Game;
 import app.game.Move;
 import app.game.Player;
@@ -11,11 +12,11 @@ import java.util.Map;
  */
 public class ReceiveMoveResponse implements Response {
 
-    private Game game;
+    private App app;
     private Map<String, String> params;
 
-    public ReceiveMoveResponse(Game game, Map<String, String> params) {
-        this.game = game;
+    public ReceiveMoveResponse(App app, Map<String, String> params) {
+        this.app = app;
         this.params = params;
     }
 
@@ -29,7 +30,7 @@ public class ReceiveMoveResponse implements Response {
                     Integer.parseInt(params.get("MOVE")),
                     new Player(params.get("PLAYER"))
             );
-            game.placeMove(move);
+            app.getGame().placeMove(move);
         }
     }
 }

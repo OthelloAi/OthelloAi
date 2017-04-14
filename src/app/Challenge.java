@@ -23,6 +23,14 @@ public class Challenge {
         return accept;
     }
 
+    public String getChallenger() {
+        return username;
+    }
+
+    public GameType getGameType() {
+        return gameType;
+    }
+
     public void setId(int id) {
         this.id = id;
     }

@@ -1,19 +1,20 @@
 package app.network.responses;
 
+import app.App;
 import app.game.Game;
 import app.game.Player;
 
 import java.util.ArrayList;
 
 /**
- * @author js
+ * @author Joël Hoekstra
  */
 public class PlayerListResponse implements Response {
     private ArrayList<String> playerList;
-    private Game game;
+    private App app;
 
-    public PlayerListResponse(Game game, ArrayList<String> playerList) {
-        this.game = game;
+    public PlayerListResponse(App app, ArrayList<String> playerList) {
+        this.app = app;
         this.playerList = playerList;
     }
 
@@ -23,7 +24,6 @@ public class PlayerListResponse implements Response {
         for (String player : playerList) {
             players.add(new Player(player));
         }
-
-        game.setPlayers(players);
+        app.setOnlinePlayers(players);
     }
 }
