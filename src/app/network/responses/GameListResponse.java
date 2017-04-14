@@ -3,7 +3,7 @@ package app.network.responses;
 import java.util.ArrayList;
 
 /**
- * @author js
+ * @author Joël Hoekstra
  */
 public class GameListResponse implements Response {
 
@@ -15,9 +15,10 @@ public class GameListResponse implements Response {
 
     @Override
     public void handle() {
-        System.out.println("processing GameListResponse");
-        for (String game : gameList) {
-            System.out.println(game);
-        }
+        // do nothing
+//        System.out.println("processing GameListResponse");
+//        for (String game : gameList) {
+//            System.out.println(game);
+//        }
     }
 }

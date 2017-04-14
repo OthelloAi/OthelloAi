@@ -79,8 +79,7 @@ public final class Board {
         return false;
     }
 
-    public void flipColors(Move move, Token token) {
-        int position = move.getPosition();
+    public void flipColors(int position, Token token) {
         int posY = position / board.length;
         int posX = position % board.length;
 
@@ -115,6 +114,10 @@ public final class Board {
         int x = position % board.length;
 
         board[y][x] = token;
+
+        if (gameType == GameType.REVERSI) {
+            flipColors(position, token);
+        }
     }
 
     public ArrayList<Integer> getPossibleMoves() {

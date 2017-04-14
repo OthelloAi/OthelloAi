@@ -1,5 +1,6 @@
 package app.network.responses;
 
+import app.App;
 import app.game.Game;
 import app.Subscribe;
 
@@ -7,16 +8,16 @@ import app.Subscribe;
  * @author Joël Hoekstra
  */
 public class SubscribeResponse implements Response {
-    private Game game;
+    private App app;
     private Subscribe subscribe;
 
-    public SubscribeResponse(Game game, Subscribe subscribe) {
-        this.game = game;
+    public SubscribeResponse(App app, Subscribe subscribe) {
+        this.app = app;
         this.subscribe = subscribe;
     }
 
     @Override
     public void handle() {
-        game.setGameType(subscribe.getGameType());
+        app.getGame().setGameType(subscribe.getGameType());
     }
 }

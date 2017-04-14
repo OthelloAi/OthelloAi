@@ -1,5 +1,7 @@
 package app.network.responses;
 
+import app.App;
+import app.game.EndState;
 import app.game.Game;
 import app.gui.alerts.YouWonAlert;
 import javafx.application.Platform;
@@ -12,15 +14,16 @@ import java.util.Map;
  */
 public class GameWinResponse implements Response {
     private Map<String, String> params;
-    private Game game;
+    private App app;
 
-    public GameWinResponse(Game game, Map<String, String> params) {
-        this.game = game;
+    public GameWinResponse(App app, Map<String, String> params) {
+        this.app = app;
         this.params = params;
     }
 
     @Override
     public void handle() {
+        app.getGame().endMatch(EndState.WIN);
         Platform.runLater(() -> {
             Alert alert = new YouWonAlert();
             alert.showAndWait();

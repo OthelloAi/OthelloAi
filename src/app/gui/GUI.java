@@ -11,6 +11,7 @@ import app.game.Player;
 import app.gui.dialogs.*;
 import app.network.CommandSender;
 import app.utils.Config;
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -128,7 +129,7 @@ public class GUI extends BorderPane {
 
     private MenuItem menuItemAllPlayers() {
         MenuItem item = new MenuItem("Show Players");
-        item.setOnAction(e-> {List<String> showPlayers = new ArrayList<>();
+        item.setOnAction(e -> {
             Stage stage = new Stage();
 
             GridPane grid = new GridPane();
@@ -143,7 +144,7 @@ public class GUI extends BorderPane {
 
             ListView lv = new ListView();
             Platform.runLater(() -> {
-                for (Player player : game.getPlayerList()) {
+                for (Player player : app.getOnlinePlayers()) {
                     lv.getItems().add(player.getUsername());
                 }
             });
@@ -158,13 +159,24 @@ public class GUI extends BorderPane {
                 try{
                     Thread.sleep(100);
                 }catch (InterruptedException we){}
-                for (Player player : game.getPlayerList()) {
+                for (Player player : app.getOnlinePlayers()) {
                     lv.getItems().add(player.getUsername());
                 }
             });
 
+            lv.setOnMouseClicked(lve -> {
+                String possibleOpponent = lv.getSelectionModel().getSelectedItem().toString();
+                ChallengePlayerDialog dialog = new ChallengePlayerDialog(app, possibleOpponent);
+                Optional<Pair<String, String>> result = dialog.display();
+                setLeftStatusText("Challenging player " + lv.getSelectionModel().getSelectedItem().toString());
+                result.ifPresent(command -> {
+                    setLeftStatusText("Challenged " + command.getKey() + " for a game of " + command.getValue());
+                    CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
+                });
+            });
+
             grid.add(refreshBtn,0,1);
-            game.addStage(stage);
+            app.addStage(stage);
             CommandSender.addCommand(new PlayerListCommand());
         });
         return item;
@@ -187,7 +199,7 @@ public class GUI extends BorderPane {
         MenuItem item = new MenuItem("Do Move");
         item.setOnAction(e -> {
             int position = game.getActor().getNext(game.getPossibleMoves());
-            Move move = new Move(position, game.getLoggedInPlayer());
+            Move move = new Move(position, app.getUser());
             CommandSender.addCommand(new MoveCommand(move));
         });
         return item;
@@ -197,8 +209,8 @@ public class GUI extends BorderPane {
         MenuItem item = new MenuItem("Forfeit");
         item.setOnAction(e -> {
             setLeftStatusText("You have forfeited the game");
-            game.forfeit(); // TODO: 14/04/2017 add such a method
             CommandSender.addCommand(new ForfeitCommand());
+            game.forfeit();
         });
         return item;
     }
@@ -206,7 +218,7 @@ public class GUI extends BorderPane {
     private MenuItem menuItemChallenge() {
         MenuItem item = new MenuItem("Challenge Player");
         item.setOnAction(e -> {
-            ChallengeDialog dialog = new ChallengeDialog(game);
+            ChallengeDialog dialog = new ChallengeDialog(app);
             Optional<Pair<String, String>> result = dialog.display();
             setLeftStatusText("Challenging another player");
             result.ifPresent(command -> {

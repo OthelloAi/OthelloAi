@@ -1,5 +1,6 @@
 package app.network;
 
+import app.App;
 import app.game.Game;
 import app.Protocol;
 import app.network.commands.Command;
@@ -23,10 +24,10 @@ public class CommandSender implements Protocol, Runnable {
     private Socket socket;
     private boolean running;
     private InputHandler inputHandler;
-    private Game game;
+    private App app;
 
-    public CommandSender(Game game, Socket socket) {
-        this.game = game;
+    public CommandSender(App app, Socket socket) {
+        this.app = app;
         this.socket = socket;
         commands = new ArrayList<>();
         sentCommands = new LinkedList<>();
@@ -40,7 +41,7 @@ public class CommandSender implements Protocol, Runnable {
             if (socket != null) {
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-                inputHandler = new InputHandler(game, in, this);
+                inputHandler = new InputHandler(app, in, this);
                 Thread thread = new Thread(inputHandler);
                 thread.setDaemon(true);
                 thread.start();

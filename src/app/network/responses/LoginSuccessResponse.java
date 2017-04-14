@@ -1,5 +1,6 @@
 package app.network.responses;
 
+import app.App;
 import app.game.Game;
 import app.game.Player;
 
@@ -8,20 +9,20 @@ import app.game.Player;
  */
 public class LoginSuccessResponse implements Response {
 
-    private Game game;
+    private App app;
     private Player player;
 
-    public LoginSuccessResponse(Game game, Player player) {
-        this.game = game;
+    public LoginSuccessResponse(App app, Player player) {
+        this.app = app;
         this.player = player;
     }
 
     @Override
     public void handle() {
-        if (game == null) {
+        if (app.getGame() == null) {
             return;
         }
-        game.setLogin(true);
-        game.setLoggedInPlayer(player);
+        app.addUser(player);
+        app.getGame().update();
     }
 }

@@ -21,18 +21,21 @@ public class Match {
 
     private boolean started = false;
     private boolean finished = false;
+    private boolean forfeited = false;
 
     private GameState gameState;
 
     private ArrayList<Move> moves;
+
+
 
     public Match(GameType gameType, Player playerOne, Player playerTwo) {
         this.gameType = gameType;
         moves = new ArrayList<>();
         addPlayerOne(playerOne);
         addPlayerTwo(playerTwo);
-        System.out.println("Player One: " + playerOne.getUsername());
-        System.out.println("Player Two: " + playerTwo.getUsername());
+//        System.out.println("Player One: " + playerOne.getUsername());
+//        System.out.println("Player Two: " + playerTwo.getUsername());
         activePlayer = playerOne;
     }
 
@@ -54,11 +57,8 @@ public class Match {
         return playerOne;
     }
 
-
-
     public void addPlayerTwo(Player player) {
         this.playerTwo = player;
-        start(); // yeah or no?
     }
 
     public Player getPlayerTwo() {
@@ -67,6 +67,9 @@ public class Match {
 
     public void start() {
         started = true;
+    }
+    public void stop() {
+       forfeit();
     }
 
     public void addGameState(GameState gameState) {
@@ -78,11 +81,38 @@ public class Match {
         }
     }
 
+    public void forfeit() {
+        forfeited = true;
+    }
+
+    public boolean isForfeited() {
+        return forfeited;
+    }
+
     public boolean isStarted() {
         return started;
     }
-
     public boolean isFinished() {
         return finished;
+    }
+
+    public boolean canDoMove() {
+        if (!started || forfeited || finished) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    public Token getTokenByPlayer(Player player) {
+        if (player.getUsername().equals(getPlayerOne().getUsername())) {
+            if (gameType == GameType.REVERSI) return new Token(TokenState.BLACK);
+            if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.CROSS);
+        }
+
+        if (player.getUsername().equals(getPlayerTwo().getUsername())) {
+            if (gameType == GameType.REVERSI) return new Token(TokenState.WHITE);
+            if (gameType == GameType.TIC_TAC_TOE) return new Token(TokenState.NOUGHT);
+        }
+        return new Token(TokenState.EMPTY);
     }
 }

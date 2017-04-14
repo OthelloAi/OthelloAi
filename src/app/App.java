@@ -1,6 +1,7 @@
 package app;
 
 import app.game.Game;
+import app.game.Player;
 import app.gui.GUI;
 import app.gui.alerts.CouldNotConnectAlert;
 import app.gui.dialogs.ConnectionDialog;
@@ -26,11 +27,31 @@ public class App extends Application {
     private Connection connection = Connection.getInstance();
     private CommandSender sender;
     private Thread commandSenderThread;
+    private GUI gui;
+    private Player user;
     private Game game;
 
+    private ArrayList<Player> onlinePlayers = new ArrayList<>();
+
     public App() {
-        game = new Game();
+        game = new Game(this);
         connection.connect();
+    }
+
+    public void addUser(Player user) {
+        this.user = user;
+    }
+
+    public Player getUser() {
+        return user;
+    }
+
+    public void setOnlinePlayers(ArrayList<Player> players) {
+        this.onlinePlayers = players;
+    }
+
+    public ArrayList<Player> getOnlinePlayers() {
+        return onlinePlayers;
     }
 
     @Override
@@ -40,7 +61,7 @@ public class App extends Application {
             if (askUserToConnect()) {
                 Connection.getInstance().connect();
                 if (Connection.getInstance().isConnected()) {
-                    sender = new CommandSender(game, Connection.getInstance().getSocket());
+                    sender = new CommandSender(this, Connection.getInstance().getSocket());
                     commandSenderThread = new Thread(sender);
                     commandSenderThread.setDaemon(true);
                     commandSenderThread.start();
@@ -53,7 +74,7 @@ public class App extends Application {
             }
         }
 
-        GUI gui = new GUI(this);
+        gui = new GUI(this);
         Scene scene = new Scene(gui, 800, 600);
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
@@ -63,8 +84,19 @@ public class App extends Application {
         });
     }
 
+    public void addStage(Stage stage) {
+        stages.add(stage);
+    }
+
+    public Game newGame() {
+        // TODO: 14/04/2017 create a new game object and update gui, etc with this.
+        return game;
+    }
     public Game getGame() {
         return game;
+    }
+    public GUI getGUI() {
+        return gui;
     }
 
     private boolean askUserToConnect() {
@@ -84,8 +116,6 @@ public class App extends Application {
                 int portNumber = Integer.parseInt(str.substring(str.indexOf(":")+1));
                 Connection.getInstance().setPort(portNumber);
                 Connection.getInstance().setHost(hostName);
-//                System.out.println("hostname: " + hostName);
-//                System.out.println("Port number: " + portNumber);
                 return true;
             } else {
                 // If result is not valid show error message
@@ -105,7 +135,9 @@ public class App extends Application {
     public void stop() {
         CommandSender.addCommand(new LogoutCommand());
         for (Stage stage : stages) {
-            stage.close();
+            if (stage != null) {
+                stage.close();
+            }
         }
     }
 }
