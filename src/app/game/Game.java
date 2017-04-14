@@ -123,37 +123,6 @@ public class Game {// implements Protocol {
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves();
     }
-  
-//    public void showNotification(String message) {
-//        showNotification(message, "", "");
-//    }
-//
-//    public void showNotification(String message, String title, String header) {
-//        Platform.runLater(() -> {
-//            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-//            alert.setTitle("Notification: " + title);
-//            alert.setHeaderText(header);
-//            alert.setContentText(message);
-//            alert.showAndWait();
-//        });
-//    }
-//
-//    public void showAlert(String message) {
-//        showAlert(message, "", "");
-//    }
-//
-//    public void showAlert(String message, String title, String header) {
-//        Platform.runLater(() -> {
-//                Alert alert = new Alert(Alert.AlertType.ERROR);
-//                alert.setTitle("ERROR: " + title);
-//                alert.setHeaderText(header);
-//                alert.setContentText(message);
-//                alert.showAndWait();
-//            });
-//    }
-//    public void handleCommand(Command command) {
-//        sender.addCommand(command);
-//    }
 
     public boolean isLoggedIn() {
         return (loggedInPlayer != null);
@@ -165,9 +134,11 @@ public class Game {// implements Protocol {
             StartMatchAlert startMatchAlert = new StartMatchAlert();
             startMatchAlert.showAndWait();
         });
+
         board = new Board(gameType);
         gui.reset();
         match = new Match(gameType, playerOne, playerTwo);
+        gui.setLeftStatusText("You have been placed in a new match. Good luck!");
     }
 
     public void placeMove(Move move) {
@@ -185,6 +156,10 @@ public class Game {// implements Protocol {
             // perhaps the reset should happen here.
             // or an empty game gui should be rendered.
         }
+    }
+    
+    public void forfeit() {
+        // TODO: 14/04/2017 handle forfeit
     }
 
     public void handleMove(Integer movePosition){
