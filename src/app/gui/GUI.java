@@ -36,7 +36,6 @@ public class GUI extends BorderPane {
     private App app;
     private GameGUI gameGUI;
     private Label leftStatus = new Label("Try to login. See File > Login");
-    private Label rightStatus = new Label("");
 
     public GUI(App app) {
         this.app = app;
@@ -89,7 +88,7 @@ public class GUI extends BorderPane {
     }
     private void createStatusBar() {
         HBox hBox = new HBox();
-        hBox.getChildren().addAll(leftStatus, rightStatus);
+        hBox.getChildren().addAll(leftStatus);
         setBottom(hBox);
     }
 
@@ -117,10 +116,14 @@ public class GUI extends BorderPane {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(command -> {
                 CommandSender.addCommand(new LoginCommand(result.get()));
-                leftStatus.setText("Welcome " + command);
+                setLeftStatusText("Welcome " + command);
             });
         });
         return item;
+    }
+
+    public void setLeftStatusText(String text) {
+        Platform.runLater(() -> leftStatus.setText(text));
     }
 
     private MenuItem menuItemAllPlayers() {
@@ -173,7 +176,7 @@ public class GUI extends BorderPane {
             MoveDialog dialog = new MoveDialog();
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(movePosition -> {
-//                this.movePosition = Integer.parseInt(movePosition);
+                setLeftStatusText("Made the move " + movePosition);
                 game.handleMove(Integer.parseInt(movePosition));
             });
         });
@@ -193,6 +196,8 @@ public class GUI extends BorderPane {
     private MenuItem menuItemForfeit() {
         MenuItem item = new MenuItem("Forfeit");
         item.setOnAction(e -> {
+            setLeftStatusText("You have forfeited the game");
+            game.forfeit(); // TODO: 14/04/2017 add such a method
             CommandSender.addCommand(new ForfeitCommand());
         });
         return item;
@@ -203,7 +208,9 @@ public class GUI extends BorderPane {
         item.setOnAction(e -> {
             ChallengeDialog dialog = new ChallengeDialog(game);
             Optional<Pair<String, String>> result = dialog.display();
+            setLeftStatusText("Challenging another player");
             result.ifPresent(command -> {
+                setLeftStatusText("Challenged " + command.getKey() + " for a game of " + command.getValue());
                 CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
             });
         });
@@ -217,10 +224,10 @@ public class GUI extends BorderPane {
             choices.add("Reversi");
             choices.add("Tic-tac-toe");
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
-            leftStatus.setText("Subscribing...");
+            setLeftStatusText("Subscribing...");
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(gameType -> {
-                leftStatus.setText("Subscribed to " + gameType + ". Waiting for opponent..");
+                setLeftStatusText("Subscribed to " + gameType + ". Waiting for opponent..");
                 CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
             });
         });
