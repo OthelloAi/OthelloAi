@@ -133,8 +133,10 @@ public class InputHandler implements Runnable {
         } else if (responseString.equals("OK")) {
             return handleResponseToCommand(sender.getOldestSentCommand());
         } else if (responseString.startsWith("ERR")) {
-            sender.getOldestSentCommand();
-            return handleErrorResponse(responseString);
+            if (!responseString.startsWith("Cannot challenge self", 4)) {
+                sender.getOldestSentCommand();
+                return handleErrorResponse(responseString);
+            }
 //            if (responseString.startsWith("DUPLICATE NAME"))
         }
         return new NullResponse();
