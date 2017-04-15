@@ -268,7 +268,9 @@ public class GUI extends BorderPane {
         int posX = (intX / 80);
         int posY = (intY / 80);
         int position = (posY * 8) + posX;
-        game.handleMove(position);
+        if (posX < 8 && posY < 8) {
+            game.handleMove(position);
+        }
     }
 
     public void reset() {
