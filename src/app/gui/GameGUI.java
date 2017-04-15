@@ -10,8 +10,9 @@ import javafx.scene.layout.RowConstraints;
  */
 public abstract class GameGUI extends GridPane {
     protected Token[][] board;
-    private ColumnConstraints col = new ColumnConstraints(80);
-    private RowConstraints row = new RowConstraints(80);
+    protected int tileSize = 80;
+    private ColumnConstraints col = new ColumnConstraints(tileSize);
+    private RowConstraints row = new RowConstraints(tileSize);
 
     protected final void setBoard(Token[][] board) {
         this.board = board;

@@ -44,6 +44,8 @@ public class GUI extends BorderPane {
     private GameGUI gameGUI;
     private Label leftStatus = new Label("Try to login. See File > Login");
 
+    private int boardlength;
+
     public GUI(App app) {
         this.app = app;
         this.game = app.getGame();
@@ -81,11 +83,13 @@ public class GUI extends BorderPane {
             if (game.isLoggedIn()) {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
+                    this.boardlength = 8;
                     gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                     setCenter(gameGUI);
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
+                    this.boardlength = 3;
                     gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                     setCenter(gameGUI);
                 }
@@ -265,10 +269,10 @@ public class GUI extends BorderPane {
         Double doubleY = e.getY();
         int intX = doubleX.intValue();
         int intY = doubleY.intValue();
-        int posX = (intX / 80);
-        int posY = (intY / 80);
-        int position = (posY * 8) + posX;
-        if (posX < 8 && posY < 8) {
+        int posX = (intX / gameGUI.tileSize);
+        int posY = (intY / gameGUI.tileSize);
+        int position = (posY * this.boardlength) + posX;
+        if (posX < this.boardlength && posY < this.boardlength) {
             game.handleMove(position);
         }
     }
