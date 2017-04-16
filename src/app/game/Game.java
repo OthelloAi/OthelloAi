@@ -3,11 +3,8 @@ package app.game;
 import app.*;
 import app.actors.Actor;
 import app.actors.MiniMaxActor;
-import app.gui.alerts.CouldNotConnectAlert;
-import app.gui.alerts.InvalidMoveAlert;
+import app.gui.alerts.*;
 import app.gui.dialogs.ConnectionDialog;
-import app.gui.alerts.AcceptDeclineAlert;
-import app.gui.alerts.StartMatchAlert;
 import app.network.CommandSender;
 import app.network.Connection;
 import javafx.application.Application;
@@ -20,6 +17,7 @@ import app.network.commands.*;
 import app.gui.GUI;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Random;
 import java.util.regex.Matcher;
@@ -106,10 +104,6 @@ public class Game {
         return match;
     }
 
-    public ArrayList<Integer> getPossibleMoves() {
-        return board.getPossibleMoves();
-    }
-
     public boolean isLoggedIn() {
         return (app.getUser() != null);
     }
@@ -150,20 +144,49 @@ public class Game {
 
     public void handleMove(Integer movePosition){
         Move move = new Move(movePosition, app.getUser());
+        // TODO: 16-4-2017 finish and implement
+        // If it's not your turn
+        /** if(move.getPlayer() != this.playerToMove){
+            Platform.runLater(() -> {
+                Alert alert = new NotYourTurnAlert();
+                alert.showAndWait();
+            });
+        } **/
+        // If your move is valid
         if(board.isValidMove(move, match.getTokenByPlayer(move.getPlayer())))
         {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
         }
+        // If your move isn't valid
         else
             {
-                // return alert that move isn't valid
                 System.out.println("Invalid move!");
                 Platform.runLater(() -> {
                     Alert alert = new InvalidMoveAlert();
                     alert.showAndWait();
                 });
             }
+    }
+
+    // TODO: 16-4-2017 Finish and implement
+    public ArrayList<Integer> getPossibleMoves() {
+        ArrayList<Integer> possibleMoves = new ArrayList<>();
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                int position = (y * 8) + x;
+                Move move = new Move(position, app.getUser());
+                if (board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
+                    possibleMoves.add(move.getPosition());
+                    // TODO: 16-4-2017 implement 
+                    // board.getBoard()[y][x].setTokenState(TokenState.POSSIBLE);
+                }
+            }
+        }
+        System.out.println(Arrays.toString(possibleMoves.toArray()));
+        return possibleMoves;
     }
 
     public void update() {

@@ -44,7 +44,7 @@ public class GUI extends BorderPane {
     private GameGUI gameGUI;
     private Label leftStatus = new Label("Try to login. See File > Login");
 
-    private int boardlength;
+    private int boardLength;
 
     public GUI(App app) {
         this.app = app;
@@ -83,12 +83,12 @@ public class GUI extends BorderPane {
             if (game.isLoggedIn()) {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
-                    this.boardlength = 8;
+                    this.boardLength = 8;
                     setCenter(gameGUI);
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
-                    this.boardlength = 3;
+                    this.boardLength = 3;
                     setCenter(gameGUI);
                 }
                 if (gameGUI != null) {
@@ -108,7 +108,8 @@ public class GUI extends BorderPane {
         Menu menu = new Menu("Actions");
         menu.getItems().addAll(
                 menuItemForfeit(),
-                menuItemMove()
+                menuItemMove(),
+                menuItemHelp()
         );
         return menu;
     }
@@ -226,6 +227,14 @@ public class GUI extends BorderPane {
         return item;
     }
 
+    private MenuItem menuItemHelp(){
+        MenuItem item = new MenuItem("Help");
+        item.setOnAction(e -> {
+            game.getPossibleMoves();
+        });
+        return item;
+    }
+
     private MenuItem menuItemChallenge() {
         MenuItem item = new MenuItem("Challenge Player");
         item.setOnAction(e -> {
@@ -270,8 +279,8 @@ public class GUI extends BorderPane {
         int intY = doubleY.intValue();
         int posX = (intX / gameGUI.tileSize);
         int posY = (intY / gameGUI.tileSize);
-        int position = (posY * this.boardlength) + posX;
-        if (posX < this.boardlength && posY < this.boardlength) {
+        int position = (posY * this.boardLength) + posX;
+        if (posX < this.boardLength && posY < this.boardLength) {
             game.handleMove(position);
         }
     }

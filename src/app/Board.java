@@ -4,9 +4,12 @@ import app.game.GameType;
 import app.game.Move;
 import app.game.MoveExplorer;
 import app.game.Player;
+import app.network.responses.YourTurnResponse;
 
 import java.awt.*;
 import java.util.*;
+
+import static app.TokenState.POSSIBLE;
 
 /**
  * @author Joël Hoekstra
@@ -45,12 +48,12 @@ public final class Board {
     }
 
     public boolean isValidMove(Move move, Token token) {
-
         if (gameType == GameType.TIC_TAC_TOE) {
             return true;
         }
-        // Get position
+
         int position = move.getPosition();
+
         int posY = position / board.length;
         int posX = position % board.length;
         Token currentMove = board[posY][posX];
@@ -96,6 +99,7 @@ public final class Board {
 
             for (int x = -1; x <= 1; x++) { // Loop through every horizontal direction
                 for (int y = -1; y <= 1; y++) { // Loop through every vertical direction
+
                     int offset = 1; // We use this to check further in the same direction
 
                     while (inBounds(posX + (x * offset), posY + (y * offset)) && board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) // While we find enemies in a certain direction
@@ -129,18 +133,4 @@ public final class Board {
             flipColors(position, token);
         }
     }
-
-    public ArrayList<Integer> getPossibleMoves() {
-        ArrayList<Integer> possibleMoves = new ArrayList<>();
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board.length; x++) {
-                if (board[y][x].toString().equals(" ")) {
-                    possibleMoves.add(y * board.length + x);
-                }
-            }
-        }
-
-        return possibleMoves;
-    }
-
 }
