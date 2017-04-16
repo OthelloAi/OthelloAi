@@ -65,18 +65,26 @@ public final class Board {
                 for (int y = -1; y <= 1; y++) {
                     int offset = 1; // Used to look further into the same direction
 
-                    while (board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) // While there are tokens in opposite color in a direction
+                    while (inBounds(posX + (x * offset), posY + (y * offset)) && board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) { // While there are tokens in opposite color in a direction
+                        System.out.println(position + " -> " + (posY + (y * offset)));
+                        System.out.println(position + " -> " + (posX + (x * offset)));
                         offset++; // Add 1 to offset
-
+                    }
                     if (offset == 1) // If the offset is still equal to one, meaning that there were no opposite tokens found, continue in the loop
                         continue;
-                    if (board[posY + (y * offset)][posX + (x * offset)].getState() == playerToken) // Check whether a token of some color was found after the opposite one
-                        return true; // If so, the move is valid
+                    if (inBounds(posX + (x * offset), posY + (y * offset))) {
+                        if (board[posY + (y * offset)][posX + (x * offset)].getState() == playerToken) // Check whether a token of some color was found after the opposite one
+                            return true; // If so, the move is valid
+                    }
                 }
             }
         }
         // If boolean cant return true, it'll end up here and return false
         return false;
+    }
+
+    public boolean inBounds(int x, int y) {
+        return ((x >= 0) && (y >= 0) && (x < board.length) && (y < board.length));
     }
 
     public void flipColors(int position, Token token) {
@@ -90,12 +98,14 @@ public final class Board {
                 for (int y = -1; y <= 1; y++) { // Loop through every vertical direction
                     int offset = 1; // We use this to check further in the same direction
 
-                    while (board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) // While we find enemies in a certain direction
+                    while (inBounds(posX + (x * offset), posY + (y * offset)) && board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) // While we find enemies in a certain direction
                     offset++; // offset = offset + 1
 
-                    if (board[posY + (y * offset)][posX + (x * offset)].getState() == playerToken) // If we do find a player after the enemies the move is allowed
-                    for (int counter = 1; counter <= offset; counter++) // Select all the enemies in between the two player stones
-                            board[posY + (counter * y)][posX + (counter * x)] = token; // And set them to the currently playing player's color
+                    if (inBounds(posX + (x * offset), posY + (y * offset))) {
+                        if (board[posY + (y * offset)][posX + (x * offset)].getState() == playerToken) // If we do find a player after the enemies the move is allowed
+                            for (int counter = 1; counter <= offset; counter++) // Select all the enemies in between the two player stones
+                                board[posY + (counter * y)][posX + (counter * x)] = token; // And set them to the currently playing player's color
+                    }
                 }
             }
     }
