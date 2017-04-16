@@ -129,6 +129,9 @@ public class Game {
                 match.addMove(move);
                 board.addMove(move.getPosition(), match.getTokenByPlayer(move.getPlayer()));
                 update();
+                if (gui.ifShowHelp){
+                    showHelp();
+                }
             }
         }
         else {
@@ -157,6 +160,7 @@ public class Game {
         {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
+            showHelp();
         }
         // If your move isn't valid
         else
@@ -170,8 +174,8 @@ public class Game {
     }
 
     // TODO: 16-4-2017 Finish and implement
-    public ArrayList<Integer> getPossibleMoves() {
-        ArrayList<Integer> possibleMoves = new ArrayList<>();
+    public ArrayList<Integer> getPossibleMoves(){
+    ArrayList<Integer> possibleMoves = new ArrayList<>();
         for (int y = 0; y < 8; y++)
         {
             for (int x = 0; x < 8; x++)
@@ -180,13 +184,33 @@ public class Game {
                 Move move = new Move(position, app.getUser());
                 if (board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
                     possibleMoves.add(move.getPosition());
-                    // TODO: 16-4-2017 implement 
-                    // board.getBoard()[y][x].setTokenState(TokenState.POSSIBLE);
                 }
             }
         }
         System.out.println(Arrays.toString(possibleMoves.toArray()));
         return possibleMoves;
+    }
+
+    public void showHelp(){
+        removeHelp();
+        for (int x : getPossibleMoves()){
+            int posY = x / 8;
+            int posX = x % 8;
+            board.getBoard()[posY][posX].setTokenState(TokenState.POSSIBLE);
+        }
+        update();
+    }
+
+    public void removeHelp(){
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                if(getBoard()[y][x].getState() == TokenState.POSSIBLE)
+                    getBoard()[y][x].setTokenState(TokenState.EMPTY);
+            }
+        }
+        update();
     }
 
     public void update() {
