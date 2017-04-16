@@ -27,10 +27,12 @@ public class GameMatchResponse implements Response {
         Player playerTwo;
         if (params.get("PLAYERTOMOVE").equals(loggedInPlayer.getUsername())) {
             playerOne = loggedInPlayer;
+            app.addUser(playerOne);
             playerTwo = opponent;
         } else {
             playerOne = opponent;
             playerTwo = loggedInPlayer;
+            app.addUser(playerTwo);
         }
         app.getGame().startMatch(
                 playerOne,

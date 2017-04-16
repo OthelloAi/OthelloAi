@@ -52,7 +52,9 @@ public class Game {
     public Actor getActor() {
         return actor;
     }
-
+    public Match getMatch() {
+        return match;
+    }
     public GameType getGameType() {
         return gameType;
     }
@@ -76,6 +78,9 @@ public class Game {
 
     public Token[][] getBoard() {
         return board.getBoard();
+    }
+    public Board getBoardObj() {
+        return board;
     }
 
     public void setPlayers(ArrayList<Player> playerList) {
@@ -109,7 +114,19 @@ public class Game {
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
-        System.out.println("You're placed in a new match..");
+        playerOne.setOpponent(playerTwo);
+        playerTwo.setOpponent(playerOne);
+
+        String playerNotice;
+        if (getLoggedInPlayer().getUsername().equals(playerOne.getUsername())) {
+            playerNotice = "Player one -> "  + TokenState.BLACK.toString();
+            System.out.println("You are player one with token " + TokenState.BLACK.toString());
+        } else {
+            playerNotice = "Player two -> "  + TokenState.WHITE.toString();
+            System.out.println("You are player two with token " + TokenState.WHITE.toString());
+        }
+
+        System.out.println(getLoggedInPlayer().getUsername() + " you're placed in a new match..");
         Platform.runLater(() -> {
             StartMatchAlert startMatchAlert = new StartMatchAlert();
             startMatchAlert.showAndWait();
@@ -120,7 +137,7 @@ public class Game {
         match = new Match(gameType, playerOne, playerTwo);
         match.start();
         update();
-        gui.setLeftStatusText("You have been placed in a new match. Good luck!");
+        gui.setLeftStatusText(getLoggedInPlayer().getUsername() + ", you have been placed in a new match. And you are " + playerNotice + " Good luck!");
     }
 
     public void placeMove(Move move) {
@@ -142,7 +159,7 @@ public class Game {
         update();
     }
 
-    public void handleMove(Integer movePosition){
+    public void handleMove(Integer movePosition) {
         Move move = new Move(movePosition, app.getUser());
         // TODO: 16-4-2017 finish and implement
         // If it's not your turn
@@ -153,40 +170,36 @@ public class Game {
             });
         } **/
         // If your move is valid
-        if(board.isValidMove(move, match.getTokenByPlayer(move.getPlayer())))
-        {
+        if(board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
+        } else { // If your move isn't valid
+            System.out.println("Invalid move!");
+            Platform.runLater(() -> {
+                Alert alert = new InvalidMoveAlert();
+                alert.showAndWait();
+            });
         }
-        // If your move isn't valid
-        else
-            {
-                System.out.println("Invalid move!");
-                Platform.runLater(() -> {
-                    Alert alert = new InvalidMoveAlert();
-                    alert.showAndWait();
-                });
-            }
     }
 
     // TODO: 16-4-2017 Finish and implement
+    // TODO: 16/04/2017 MOVED TO BOARD but here for backwards compatibility.. DEPRECATED.
     public ArrayList<Integer> getPossibleMoves() {
-        ArrayList<Integer> possibleMoves = new ArrayList<>();
-        for (int y = 0; y < 8; y++)
-        {
-            for (int x = 0; x < 8; x++)
-            {
-                int position = (y * 8) + x;
-                Move move = new Move(position, app.getUser());
-                if (board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
-                    possibleMoves.add(move.getPosition());
-                    // TODO: 16-4-2017 implement 
-                    // board.getBoard()[y][x].setTokenState(TokenState.POSSIBLE);
-                }
-            }
-        }
-        System.out.println(Arrays.toString(possibleMoves.toArray()));
-        return possibleMoves;
+        return board.getPossibleMoves(app.getUser());
+//        ArrayList<Integer> possibleMoves = new ArrayList<>();
+//        for (int y = 0; y < 8; y++) {
+//            for (int x = 0; x < 8; x++) {
+//                int position = (y * 8) + x;
+//                Move move = new Move(position, app.getUser());
+//                if (board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
+//                    possibleMoves.add(move.getPosition());
+//                    // TODO: 16-4-2017 implement
+//                    // board.getBoard()[y][x].setTokenState(TokenState.POSSIBLE);
+//                }
+//            }
+//        }
+//        System.out.println("Possible moves: " + Arrays.toString(possibleMoves.toArray()));
+//        return possibleMoves;
     }
 
     public void update() {

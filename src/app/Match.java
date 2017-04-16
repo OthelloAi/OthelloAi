@@ -27,13 +27,17 @@ public class Match {
 
     private ArrayList<Move> moves;
 
-
-
     public Match(GameType gameType, Player playerOne, Player playerTwo) {
         this.gameType = gameType;
         moves = new ArrayList<>();
+        playerOne.setOpponent(playerTwo);
         addPlayerOne(playerOne);
+        playerOne.setToken(getTokenByPlayer(playerOne));
+
+        playerTwo.setOpponent(playerOne);
         addPlayerTwo(playerTwo);
+        playerTwo.setToken(getTokenByPlayer(playerTwo));
+
 //        System.out.println("Player One: " + playerOne.getUsername());
 //        System.out.println("Player Two: " + playerTwo.getUsername());
         activePlayer = playerOne;

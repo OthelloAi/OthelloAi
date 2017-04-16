@@ -22,7 +22,8 @@ import java.util.regex.Pattern;
  * @author Joël Hoekstra
  */
 public class App extends Application {
-
+    //https://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    private static String OS = System.getProperty("os.name").toLowerCase();
     private ArrayList<Stage> stages = new ArrayList<>();
     private Connection connection = Connection.getInstance();
     private CommandSender sender;
@@ -80,7 +81,9 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
         stage.show();
-        stage.setResizable(false);
+        if (OS.indexOf("win") >= 0) {
+            stage.setResizable(false);
+        }
         stage.setOnCloseRequest(e -> {
             stop();
         });
