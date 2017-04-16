@@ -84,17 +84,16 @@ public class GUI extends BorderPane {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
                     this.boardlength = 8;
-                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                     setCenter(gameGUI);
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
                     this.boardlength = 3;
-                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                     setCenter(gameGUI);
                 }
                 if (gameGUI != null) {
                     gameGUI.render();
+                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                 }
             }
         });
