@@ -2,6 +2,7 @@ package app.gui;
 
 import app.*;
 
+import java.awt.*;
 import java.util.List;
 
 import app.game.Game;
@@ -16,6 +17,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -37,6 +43,8 @@ public class GUI extends BorderPane {
     private App app;
     private GameGUI gameGUI;
     private Label leftStatus = new Label("Try to login. See File > Login");
+
+    private int boardlength;
 
     public GUI(App app) {
         this.app = app;
@@ -75,14 +83,17 @@ public class GUI extends BorderPane {
             if (game.isLoggedIn()) {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
                     gameGUI = new OthelloGUI(game.getBoard());
+                    this.boardlength = 8;
                     setCenter(gameGUI);
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
                     gameGUI = new TicTacToeGUI(game.getBoard());
+                    this.boardlength = 3;
                     setCenter(gameGUI);
                 }
                 if (gameGUI != null) {
                     gameGUI.render();
+                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                 }
             }
         });
@@ -250,6 +261,19 @@ public class GUI extends BorderPane {
         MenuItem item = new MenuItem("Logout");
         item.setOnAction(e -> app.stop());
         return item;
+    }
+
+    private void handleMouseClick(MouseEvent e){
+        Double doubleX = e.getX();
+        Double doubleY = e.getY();
+        int intX = doubleX.intValue();
+        int intY = doubleY.intValue();
+        int posX = (intX / gameGUI.tileSize);
+        int posY = (intY / gameGUI.tileSize);
+        int position = (posY * this.boardlength) + posX;
+        if (posX < this.boardlength && posY < this.boardlength) {
+            game.handleMove(position);
+        }
     }
 
     public void reset() {

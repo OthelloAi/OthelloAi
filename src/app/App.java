@@ -75,10 +75,12 @@ public class App extends Application {
         }
 
         gui = new GUI(this);
-        Scene scene = new Scene(gui, 800, 600);
+        // TODO: 15-4-2017 Dynamically changing scene size
+        Scene scene = new Scene(gui, 630, 670);
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
         stage.show();
+        stage.setResizable(false);
         stage.setOnCloseRequest(e -> {
             stop();
         });

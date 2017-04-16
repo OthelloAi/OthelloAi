@@ -4,6 +4,7 @@ import app.*;
 import app.actors.Actor;
 import app.actors.MiniMaxActor;
 import app.gui.alerts.CouldNotConnectAlert;
+import app.gui.alerts.InvalidMoveAlert;
 import app.gui.dialogs.ConnectionDialog;
 import app.gui.alerts.AcceptDeclineAlert;
 import app.gui.alerts.StartMatchAlert;
@@ -159,10 +160,7 @@ public class Game {
                 // return alert that move isn't valid
                 System.out.println("Invalid move!");
                 Platform.runLater(() -> {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("ERROR");
-                    alert.setHeaderText("Invalid move");
-                    alert.setContentText("Sorry, the move you chose isn't valid");
+                    Alert alert = new InvalidMoveAlert();
                     alert.showAndWait();
                 });
             }
