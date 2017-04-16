@@ -46,7 +46,7 @@ public class GUI extends BorderPane {
 
     private int boardLength;
 
-    public boolean ifShowHelp;
+    public boolean ifShowHelp = false;
 
     public GUI(App app) {
         this.app = app;
@@ -231,12 +231,14 @@ public class GUI extends BorderPane {
     }
 
     public MenuItem menuItemHelp(){
-        MenuItem item = new MenuItem("Help");
+        final MenuItem item = new MenuItem("Help");
         item.setOnAction(e -> {
             System.out.println(ifShowHelp);
             if(ifShowHelp){
+                System.out.println(ifShowHelp);
                 ifShowHelp = false;
                 game.removeHelp();
+
             }
             else {
                 ifShowHelp = true;

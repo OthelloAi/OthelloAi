@@ -160,7 +160,6 @@ public class Game {
         {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
-            showHelp();
         }
         // If your move isn't valid
         else
