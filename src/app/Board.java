@@ -2,15 +2,10 @@ package app;
 
 import app.game.GameType;
 import app.game.Move;
-import app.game.MoveExplorer;
 import app.game.Player;
-import app.network.responses.YourTurnResponse;
 import app.utils.Debug;
 
-import java.awt.*;
 import java.util.*;
-
-import static app.TokenState.POSSIBLE;
 
 /**
  * @author Joël Hoekstra
@@ -32,22 +27,23 @@ public class Board {
     public Board(GameType gameType, Token[][] board) {
         this.gameType = gameType;
         this.board = deepCopy(board);
-        print();
+//        print();
     }
 
     public void print() {
-        if (board == null) {
-            Debug.println("BOARD IS NULL");
-            return;
-        }
-        Debug.println();
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board.length; x++) {
-                Debug.print(" " + board[y][x]);
-            }
-            Debug.println();
-        }
-        Debug.println();
+        return;
+//        if (board == null) {
+//            Debug.println("BOARD IS NULL");
+//            return;
+//        }
+//        Debug.println();
+//        for (int y = 0; y < board.length; y++) {
+//            for (int x = 0; x < board.length; x++) {
+//                Debug.print(" " + board[y][x]);
+//            }
+//            Debug.println();
+//        }
+//        Debug.println();
     }
     public GameType getGameType() {
         return gameType;
