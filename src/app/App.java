@@ -23,8 +23,6 @@ import java.util.regex.Pattern;
  * @author Joël Hoekstra
  */
 public class App extends Application {
-    //https://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
-    private static String OS = System.getProperty("os.name").toLowerCase();
     private ArrayList<Stage> stages = new ArrayList<>();
     private Connection connection = Connection.getInstance();
     private CommandSender sender;

@@ -1,10 +1,7 @@
 package app.network.responses;
 
 import app.App;
-import app.game.Move;
-import app.network.CommandSender;
-import app.network.commands.MoveCommand;
-import app.utils.ActorState;
+import app.utils.Debug;
 
 /**
  * @author Joël Hoekstra
@@ -15,6 +12,7 @@ public class YourTurnResponse implements Response {
 
     public YourTurnResponse(App app) {
         this.app = app;
+        Debug.println("yourturnresponse");
     }
 
     @Override
@@ -22,23 +20,6 @@ public class YourTurnResponse implements Response {
         String message = app.getUser().getUsername() + ", it's your turn";
         app.getGUI().setLeftStatusText(message);
         app.getGame().setYourTurn(true);
-
-        if(app.getGame().getActorState().equals(ActorState.MINIMAX)) {
-            int position = app.getGame().getActor().getNext(app.getGame().getPossibleMoves());
-            Move move = new Move(position, app.getUser());
-            CommandSender.addCommand(new MoveCommand(move));
-        }
-
-//        if (app.getGame().usesAI()) {
-//            int aiMove = app.getGame().getActor().getNext(app.getGame().getPossibleMoves());
-//            Move move = new Move(aiMove, app.getUser());
-//            app.getGame().handleMove(aiMove);
-////            app.getGame().handleMove(move);
-//        }
-        // if human actor then do nothing
-        // else if ai then get best move and send
-        // get next move and then send it
-//        game.requestNewMove()
-//        game.handleCommand(new MoveCommand(game.getNextMove()));
+        app.getGame().sendAIMove();
     }
 }

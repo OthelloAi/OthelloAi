@@ -1,8 +1,7 @@
 package app.network.responses;
 
 import app.App;
-import app.game.EndState;
-import app.game.Game;
+import app.game.GameState;
 import app.gui.alerts.YouWonAlert;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -23,7 +22,7 @@ public class GameWinResponse implements Response {
 
     @Override
     public void handle() {
-        app.getGame().endMatch(EndState.WIN);
+        app.getGame().endMatch(GameState.WIN);
         Platform.runLater(() -> {
             Alert alert = new YouWonAlert();
             alert.showAndWait();

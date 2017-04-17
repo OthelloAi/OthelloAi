@@ -1,29 +1,25 @@
 package app.network.commands;
 
+import app.game.Game;
 import app.game.Move;
-import app.utils.Debug;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Joël Hoekstra
  */
-public class MoveCommand implements Command {
+public class AIMoveCommand implements Command {
     private Move move;
     private boolean wait;
     private final CountDownLatch sendMoveLatch = new CountDownLatch(1);
+    private Game game;
 
     private static final int REQUEST_TIMEOUT_SECS = 1;
 
-    public MoveCommand(Move move) {
+    public AIMoveCommand(Game game) {
+        this.game = game;
         this.move = move;
-        wait = false;
-    }
-
-    public MoveCommand(Move move, boolean wait) {
-        this(move);
-        this.wait = wait;
+        wait = true;
     }
 
     @Override
@@ -34,10 +30,11 @@ public class MoveCommand implements Command {
             Thread t = new Thread(() -> {
                 while(true) {
                     long current = System.currentTimeMillis();
-                    long diff = ((current - start) );
+                    long diff = ((current - start) / 1);
 
 //                    Debug.println(diff);
-                    if (diff >= 1000) {
+                    if (diff >= 500) {
+                        game.redoLastMove();
                         sendMoveLatch.countDown();
                         break;
                     }
@@ -48,15 +45,18 @@ public class MoveCommand implements Command {
 
             try {
                 sendMoveLatch.await();
-                return "move " + move.getPosition();
-//                if (sendMoveLatch.await(REQUEST_TIMEOUT_SECS, TimeUnit.SECONDS)) {
-//
-//                }
+
+
+
+                int movePos = game.getActor().getNext(game.getPossibleMoves());
+                System.out.println("SEND AI move " + movePos + " from player " + game.getLoggedInPlayer().getUsername() + " with token " + game.getLoggedInPlayer().getToken());
+
+                return "move " + movePos;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
-        return "move " + move.getPosition();
+        return "";
+//        return "move " + move.getPosition();
     }
 }

@@ -2,8 +2,7 @@ package app.network.responses;
 
 import app.App;
 import app.Match;
-import app.game.EndState;
-import app.game.Game;
+import app.game.GameState;
 import app.gui.alerts.DrawGameAlert;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -24,7 +23,7 @@ public class GameDrawResponse implements Response {
 
     @Override
     public void handle() {
-        Match match = app.getGame().endMatch(EndState.DRAW);
+        app.getGame().endMatch(GameState.DRAW);
 //        PLAYERONESCORE
         // PLAYERTWOSCORE
         // COMMENT

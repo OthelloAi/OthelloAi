@@ -1,9 +1,6 @@
 package app;
 
-import app.game.GameState;
-import app.game.GameType;
-import app.game.Move;
-import app.game.Player;
+import app.game.*;
 import app.utils.Debug;
 
 import java.util.ArrayList;
@@ -13,12 +10,13 @@ import java.util.ArrayList;
  */
 public class Match {
 
+    private Game game;
+    private GameType gameType;
     private Player playerOne;
     private Player playerTwo;
     private Player winner;
     private Player activePlayer;
-
-    private GameType gameType;
+    private Player initialPlayer;
 
     private boolean started = false;
     private boolean finished = false;
@@ -27,10 +25,14 @@ public class Match {
     private GameState gameState;
 
     private ArrayList<Move> moves;
+    private ArrayList<Board> boardStates;
 
-    public Match(GameType gameType, Player playerOne, Player playerTwo) {
+    public Match(Game game, GameType gameType, Player playerOne, Player playerTwo) {
+        this.game = game;
         this.gameType = gameType;
         moves = new ArrayList<>();
+        boardStates = new ArrayList<>();
+
         playerOne.setOpponent(playerTwo);
         addPlayerOne(playerOne);
         playerOne.setToken(getTokenByPlayer(playerOne));
@@ -39,17 +41,40 @@ public class Match {
         addPlayerTwo(playerTwo);
         playerTwo.setToken(getTokenByPlayer(playerTwo));
 
-        activePlayer = playerOne;
+        initialPlayer = playerOne;
+    }
+
+    private void printMovesList() {
+        for (Move move : moves) {
+            Debug.print(move.getPosition() + ", ");
+        }
+        Debug.println();
+    }
+
+    private void processMove(Move move) {
+        moves.add(move);
+//        printMovesList();
+        Player player = move.getPlayer();
+        Board b = new Board(game.getBoardObj()); // clone board
+        b.addMove(move.getPosition(), player.getToken()); // add move to cloned board
+        boardStates.add(b);
+        game.getBoardObj().setBoard(b.deepCopy(b.getBoard()));//.addMove(move.getPosition(), player.getToken());
+        game.update();
+    }
+
+    public boolean gameOver(Board b) {
+        if (gameState == GameState.LOSS || gameState == GameState.DRAW || gameState == GameState.WIN) {
+            return true;
+        }
+//        if (b.getPossibleMoves(playerOne).size() == 0 && b.getPossibleMoves(playerTwo).size() > 0) {
+//            Debug.println("BOTH PLAYERS HAVE NO MOVES LEFT");
+//            return true;
+//        }
+        return false;
     }
 
     public void addMove(Move move) {
-        moves.add(move);
-        Debug.println("Player: " + move.getPlayer().getUsername() + " made move: " + move.getPosition());
-        if (playerOne.getUsername().equals(move.getPlayer().getUsername())) {
-            activePlayer = playerTwo;
-        } else if (playerTwo.getUsername().equals(move.getPlayer().getUsername())) {
-            activePlayer = playerOne;
-        }
+        processMove(move);
     }
 
     public void addPlayerOne(Player player) {
@@ -72,8 +97,8 @@ public class Match {
         if (playerOne == null || playerTwo == null) {
             return;
         }
+        activePlayer = playerOne;
         gameState = GameState.CONTINUE;
-        started = true;
     }
 
     public void stop(GameState gameState) {
@@ -105,6 +130,7 @@ public class Match {
     public boolean canDoMove() {
         return (gameState == GameState.CONTINUE); // todo duplicate functionality.. CLEAN UP
     }
+
     public Token getTokenByPlayer(Player player) {
         if (player.getUsername().equals(getPlayerOne().getUsername())) {
             if (gameType == GameType.REVERSI) return new Token(TokenState.BLACK);
