@@ -4,6 +4,7 @@ import app.game.GameState;
 import app.game.GameType;
 import app.game.Move;
 import app.game.Player;
+import app.utils.Debug;
 
 import java.util.ArrayList;
 
@@ -27,21 +28,23 @@ public class Match {
 
     private ArrayList<Move> moves;
 
-
-
     public Match(GameType gameType, Player playerOne, Player playerTwo) {
         this.gameType = gameType;
         moves = new ArrayList<>();
+        playerOne.setOpponent(playerTwo);
         addPlayerOne(playerOne);
+        playerOne.setToken(getTokenByPlayer(playerOne));
+
+        playerTwo.setOpponent(playerOne);
         addPlayerTwo(playerTwo);
-//        System.out.println("Player One: " + playerOne.getUsername());
-//        System.out.println("Player Two: " + playerTwo.getUsername());
+        playerTwo.setToken(getTokenByPlayer(playerTwo));
+
         activePlayer = playerOne;
     }
 
     public void addMove(Move move) {
         moves.add(move);
-        System.out.println("Player: " + move.getPlayer().getUsername() + " made move: " + move.getPosition());
+        Debug.println("Player: " + move.getPlayer().getUsername() + " made move: " + move.getPosition());
         if (playerOne.getUsername().equals(move.getPlayer().getUsername())) {
             activePlayer = playerTwo;
         } else if (playerTwo.getUsername().equals(move.getPlayer().getUsername())) {
@@ -66,10 +69,16 @@ public class Match {
     }
 
     public void start() {
+        if (playerOne == null || playerTwo == null) {
+            return;
+        }
+        gameState = GameState.CONTINUE;
         started = true;
     }
-    public void stop() {
-       forfeit();
+
+    public void stop(GameState gameState) {
+       this.gameState = gameState;
+       finished = true;
     }
 
     public void addGameState(GameState gameState) {
@@ -82,26 +91,19 @@ public class Match {
     }
 
     public void forfeit() {
+        stop(GameState.LOSS);
         forfeited = true;
     }
 
-    public boolean isForfeited() {
-        return forfeited;
-    }
-
     public boolean isStarted() {
-        return started;
+        return (gameState == GameState.CONTINUE);
     }
     public boolean isFinished() {
-        return finished;
+        return (gameState != GameState.CONTINUE);
+//        return finished;
     }
-
     public boolean canDoMove() {
-        if (!started || forfeited || finished) {
-            return false;
-        } else {
-            return true;
-        }
+        return (gameState == GameState.CONTINUE); // todo duplicate functionality.. CLEAN UP
     }
     public Token getTokenByPlayer(Player player) {
         if (player.getUsername().equals(getPlayerOne().getUsername())) {

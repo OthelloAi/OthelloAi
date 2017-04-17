@@ -1,6 +1,7 @@
 package app.actors;
 
 import app.batman.*;
+
 import java.util.ArrayList;
 
 
@@ -12,7 +13,6 @@ public class BatmanActor implements Actor {
 
     public BatmanActor() {
         Batman batman = new Batman();
-        System.out.println(batman.toString());
     }
 
     @Override

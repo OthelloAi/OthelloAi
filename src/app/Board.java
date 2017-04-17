@@ -5,6 +5,7 @@ import app.game.Move;
 import app.game.MoveExplorer;
 import app.game.Player;
 import app.network.responses.YourTurnResponse;
+import app.utils.Debug;
 
 import java.awt.*;
 import java.util.*;
@@ -14,13 +15,41 @@ import static app.TokenState.POSSIBLE;
 /**
  * @author Joël Hoekstra
  */
-public final class Board {
+public class Board {
     private Token[][] board = null;
     private GameType gameType;
 
     public Board(GameType gameType) {
         this.gameType = gameType;
         generateBoard();
+    }
+
+    public Board(Board b) {
+        this(b.getGameType(), b.getBoard());
+    }
+
+    public Board(GameType gameType, Token[][] board) {
+        this.gameType = gameType;
+        this.board = deepCopy(board);
+        print();
+    }
+
+    public void print() {
+        if (board == null) {
+            Debug.println("BOARD IS NULL");
+            return;
+        }
+        Debug.println();
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board.length; x++) {
+                Debug.print(" " + board[y][x]);
+            }
+            Debug.println();
+        }
+        Debug.println();
+    }
+    public GameType getGameType() {
+        return gameType;
     }
 
     private void generateBoard() {
@@ -47,12 +76,11 @@ public final class Board {
         }
     }
 
-    public boolean isValidMove(Move move, Token token) {
+
+    public boolean isValidMove(int position, Token token) {
         if (gameType == GameType.TIC_TAC_TOE) {
             return true;
         }
-
-        int position = move.getPosition();
 
         int posY = position / board.length;
         int posX = position % board.length;
@@ -82,6 +110,11 @@ public final class Board {
         }
         // If boolean cant return true, it'll end up here and return false
         return false;
+
+    }
+
+    public boolean isValidMove(Move move, Token token) {
+        return isValidMove(move.getPosition(), token);
     }
 
     public boolean inBounds(int x, int y) {
@@ -121,7 +154,7 @@ public final class Board {
         return board;
     }
 
-    public void addMove(int position, Token token) {
+    public Board addMove(int position, Token token) {
         int y = position / board.length;
         int x = position % board.length;
 
@@ -130,5 +163,33 @@ public final class Board {
         if (gameType == GameType.REVERSI) {
             flipColors(position, token);
         }
+
+        return this;
+    }
+
+    public ArrayList<Integer> getPossibleMoves(Player player) {
+        ArrayList<Integer> possibleMoves = new ArrayList<>();
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board.length; x++) {
+                int position = y * board.length + x;
+                Move move = new Move(position, player);
+//                Debug.println("player -> " + player.getUsername() + " with token -> " + player.getToken());
+                if (isValidMove(move, player.getToken())) {
+                    possibleMoves.add(move.getPosition());
+                }
+            }
+        }
+        return possibleMoves;
+    }
+
+    public Token[][] deepCopy(Token[][] input) {
+        if (input == null) {
+            return null;
+        }
+        Token[][] result = new Token[input.length][];
+        for (int r = 0; r < input.length; r++) {
+            result[r] = input[r].clone();
+        }
+        return result;
     }
 }

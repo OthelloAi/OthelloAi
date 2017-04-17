@@ -3,16 +3,26 @@ package app.gui;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import app.Token;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 
 /**
  * @author Joël Hoekstra
+ * @author Martijn Snijder
  */
-public abstract class GameGUI extends GridPane {
+public class GameGUI extends GridPane {
+    protected GUI gui;
     protected Token[][] board;
-    protected int tileSize = 80;
-    private ColumnConstraints col = new ColumnConstraints(tileSize);
-    private RowConstraints row = new RowConstraints(tileSize);
+    private RowConstraints row = new RowConstraints();
+    private ColumnConstraints col = new ColumnConstraints();
+
+    public GameGUI(GUI gui) {
+        setGUI(gui);
+    }
+    public GameGUI(Token[][] board, GUI gui) {
+        setGUI(gui);
+        setBoard(board);
+    }
 
     protected final void setBoard(Token[][] board) {
         this.board = board;
@@ -20,14 +30,38 @@ public abstract class GameGUI extends GridPane {
         render();
     }
 
-    public void addConstraints(){
+    public void addConstraints() {
+        for (int x = 0; x < board.length; x++) {
+//            RowConstraints r = new RowConstraints();
+            row.setVgrow(Priority.ALWAYS);
+            getRowConstraints().add(row);
+        }
+
         for (int y = 0; y < board.length; y++) {
+//            ColumnConstraints c = new ColumnConstraints();
+            col.setHgrow(Priority.ALWAYS);
             getColumnConstraints().add(col);
         }
-            for (int x = 0; x < board.length; x++) {
-            getRowConstraints().add(row);
-            }
     }
 
-    public abstract void render();
+    protected final void setGUI(GUI gui) {
+        this.gui = gui;
+    }
+
+    public final void render() {
+        getChildren().clear();
+        if (board != null) {
+            for (int y = 0; y < board.length; y++) {
+                for (int x = 0; x < board.length; x++) {
+                    if (board[y][x] != null) {
+                        GridNode node = new GridNode(board[y][x]);
+                        int posX = x;
+                        int posY = y;
+                        node.setOnMouseClicked(e -> gui.handleMouseClick(posX, posY));
+                        add(node, x, y);
+                    }
+                }
+            }
+        }
+    }
 }

@@ -24,7 +24,5 @@ public class MoveResponse implements Response {
         int position = Integer.parseInt(params.get("MOVE"));
         Player player = new Player(params.get("PLAYER"));
         game.placeMove(new Move(position, player));
-//        System.out.println("Makes a move " + position);
-//        game.makeMove(new Move(position));
     }
 }

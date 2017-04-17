@@ -14,10 +14,6 @@ public class Token {
         return tokenState;
     }
 
-    public void setTokenState(TokenState tokenState){
-        this.tokenState = tokenState;
-    }
-
     @Override
     public String toString() {
         return "" + tokenState.symbol();

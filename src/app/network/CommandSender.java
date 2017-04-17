@@ -6,6 +6,7 @@ import app.Protocol;
 import app.network.commands.Command;
 import app.network.commands.NullCommand;
 import app.network.responses.Response;
+import app.utils.Debug;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -51,14 +52,14 @@ public class CommandSender implements Protocol, Runnable {
                         Command command = commands.get(0);
                         out.println(command.toString());
                         addSentCommand(command);
-                        System.out.println("[CLNT] command: " + command.toString());
+                        Debug.println("[CLNT] command: " + command.toString());
                         commands.remove(0);
                     }
 
                     if (responses.size() > 0) {
                         Response response = responses.get(0);
                         response.handle();
-                        System.out.println("[CLNT] response handled");
+                        Debug.println("[CLNT] response handled");
                     }
                     Thread.sleep(10);
                 }
