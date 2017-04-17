@@ -2,10 +2,12 @@ package app.game;
 
 import app.*;
 import app.actors.Actor;
+import app.actors.IterativeActor;
 import app.actors.MiniMaxActor;
 import app.actors.RandomActor;
 import app.gui.alerts.*;
 import app.network.CommandSender;
+import app.utils.ActorState;
 import app.utils.Debug;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
@@ -25,6 +27,7 @@ public class Game {
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
     public static Stack<Move> moves;
+    private ActorState actorState = ActorState.HUMAN;
     private Actor actor;
     private Match match = null;
     private App app;
@@ -39,8 +42,7 @@ public class Game {
         moves = new Stack<>();
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
-//        actor = new MiniMaxActor(this, board);
-        actor = new RandomActor();
+        actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
 
         moveHandler = new MoveHandler(this);
@@ -67,6 +69,10 @@ public class Game {
 
     public boolean usesAI() {
         return toUseAI;
+    }
+
+    public ActorState getActorState() {
+        return this.actorState;
     }
 
     public Actor getActor() {
@@ -134,7 +140,25 @@ public class Game {
             }
         });
     }
-    
+
+    public void setActorState(String Actor) {
+        switch (Actor) {
+            case "MiniMax" :
+                this.actor = new MiniMaxActor(this, board);
+                this.actorState = ActorState.MINIMAX;
+                break;
+            case "Iterative" :
+                this.actor = new IterativeActor();
+                this.actorState = ActorState.ITERATIVE;
+                break;
+            case "Random" :
+                this.actor = new RandomActor();
+                this.actorState = ActorState.RANDOM;
+                break;
+            case "Human" :
+                this.actorState = ActorState.HUMAN;
+        }
+    }
     public Match endMatch(EndState endState) {
 
         gui.setLeftStatusText("Match has ended.. Thanks for playing. " + endState.name());
@@ -266,4 +290,5 @@ public class Game {
     public void update() {
         gui.update();
     }
+
 }
