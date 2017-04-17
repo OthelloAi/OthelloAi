@@ -45,6 +45,8 @@ public class GUI extends BorderPane {
 
     private int boardLength;
 
+    public boolean ifShowHelp = false;
+
     public GUI(App app) {
         this.app = app;
         this.game = app.getGame();
@@ -127,9 +129,10 @@ public class GUI extends BorderPane {
         Menu menu = new Menu("Actions");
         menu.getItems().addAll(
                 menuItemForfeit(),
-                menuItemMove(),
-                menuItemHelp()
+                menuItemMove()
         );
+        if (game.getGameType() == GameType.REVERSI)
+            menu.getItems().add(menuItemHelp());
         return menu;
     }
 
@@ -248,10 +251,20 @@ public class GUI extends BorderPane {
         return item;
     }
 
-    private MenuItem menuItemHelp(){
-        MenuItem item = new MenuItem("Help");
+    public MenuItem menuItemHelp(){
+        final MenuItem item = new MenuItem("Help");
         item.setOnAction(e -> {
-            game.getPossibleMoves();
+            System.out.println(ifShowHelp);
+            if(ifShowHelp){
+                System.out.println(ifShowHelp);
+                ifShowHelp = false;
+                game.removeHelp();
+
+            }
+            else {
+                ifShowHelp = true;
+                game.showHelp();
+            }
         });
         return item;
     }

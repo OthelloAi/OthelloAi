@@ -90,15 +90,13 @@ public class Board {
         TokenState enemyToken = token.getState().opposite();
 
         // Check whether the chosen position is empty or not
-        if (currentMove.getState() == TokenState.EMPTY) {
+        if (currentMove.getState() == TokenState.EMPTY || currentMove.getState() == TokenState.POSSIBLE) {
             // Loop through all directions
             for (int x = -1; x <=1; x++) {
                 for (int y = -1; y <= 1; y++) {
                     int offset = 1; // Used to look further into the same direction
 
                     while (inBounds(posX + (x * offset), posY + (y * offset)) && board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) { // While there are tokens in opposite color in a direction
-//                        Debug.println(position + " -> " + (posY + (y * offset)));
-//                        Debug.println(position + " -> " + (posX + (x * offset)));
                         offset++; // Add 1 to offset
                     }
                     if (offset == 1) // If the offset is still equal to one, meaning that there were no opposite tokens found, continue in the loop

@@ -179,6 +179,9 @@ public class Game {
                 match.addMove(move);
                 board.addMove(move.getPosition(), move.getPlayer().getToken());//match.getTokenByPlayer(move.getPlayer())); //move.getPlayer().getToken());// todo tijdelijke check..
                 update();
+                if (gui.ifShowHelp){
+                    showHelp();
+                }
             }
         } else {
             // perhaps the reset should happen here.
@@ -236,6 +239,28 @@ public class Game {
     // TODO: 16/04/2017 MOVED TO BOARD but here for backwards compatibility.. DEPRECATED.
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves(app.getUser());
+    }
+
+    public void showHelp(){
+        removeHelp();
+        for (int x : getPossibleMoves()){
+            int posY = x / 8;
+            int posX = x % 8;
+            board.getBoard()[posY][posX].setTokenState(TokenState.POSSIBLE);
+        }
+        update();
+    }
+
+    public void removeHelp(){
+        for (int y = 0; y < 8; y++)
+        {
+            for (int x = 0; x < 8; x++)
+            {
+                if(getBoard()[y][x].getState() == TokenState.POSSIBLE)
+                    getBoard()[y][x].setTokenState(TokenState.EMPTY);
+            }
+        }
+        update();
     }
 
     public void update() {
