@@ -44,8 +44,8 @@ public class MiniMaxActor implements Actor {
         this.player = game.getLoggedInPlayer();
         board.print();
         Board b = new Board(game.getBoardObj());
-        Debug.println("cloned board gametype: " + b.getGameType());
-        Debug.println(player.getToken() + " -> " + player.getUsername() + " -> " + player.getOpponent().getUsername() + " -> " + player.getOpponent().getToken());
+//        Debug.println("cloned board gametype: " + b.getGameType());
+//        Debug.println(player.getToken() + " -> " + player.getUsername() + " -> " + player.getOpponent().getUsername() + " -> " + player.getOpponent().getToken());
         int move;
         try {
             move = getMove(player, b);
@@ -92,23 +92,23 @@ public class MiniMaxActor implements Actor {
         }
 
         int sum = IntStream.of(weights).sum(); // http://stackoverflow.com/a/17846520
-        Debug.println("getMaxValue: " + sum);
+//        Debug.println("getMaxValue: " + sum);
         return sum;
     }
 
     private int getMinValue() {
         int minValue = -getMaxValue();
-        Debug.println("getMinValue: " + minValue);
+//        Debug.println("getMinValue: " + minValue);
         return minValue;
     }
 
     private int maxScore(Player player, Board b) {
         ArrayList<Integer> moves = b.getPossibleMoves(player);
         int[] scores = new int[moves.size()];
-        Debug.println("SCORES: ");
+//        Debug.println("SCORES: ");
         for (int i = 0; i < moves.size(); i++) {
             scores[i] = scoreMove(player, b.addMove(i, player.getToken()));
-            Debug.println("move " + moves.get(i) + " - i: " + i + " score: " + scores[i]);
+//            Debug.println("move " + moves.get(i) + " - i: " + i + " score: " + scores[i]);
         }
 
         int max = getMax(scores);

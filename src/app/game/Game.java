@@ -6,26 +6,16 @@ import app.actors.IterativeActor;
 import app.actors.MiniMaxActor;
 import app.actors.RandomActor;
 import app.gui.alerts.*;
-import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
-//import app.network.Connection;
 import app.utils.ActorState;
 import app.utils.Debug;
-import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.stage.Stage;
 import app.network.commands.*;
 import app.gui.GUI;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * @author Joël Hoekstra
@@ -36,20 +26,29 @@ public class Game {
     private GameType gameType;
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
-
+    public static Stack<Move> moves;
     private ActorState actorState = ActorState.HUMAN;
     private Actor actor;
     private Match match = null;
     private App app;
     private boolean yourTurn = false;
+    private boolean processingMove = false;
+    private MoveHandler moveHandler;
 
     private boolean toUseAI = false;
 
     public Game(App app) {
         this.app = app;
+        moves = new Stack<>();
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
+        actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
+
+        moveHandler = new MoveHandler(this);
+        Thread moveHandlerThread = new Thread(moveHandler);
+        moveHandlerThread.setDaemon(true);
+        moveHandlerThread.start();
     }
 
     public void setYourTurn(boolean yourTurn) {
@@ -175,6 +174,8 @@ public class Game {
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         playerOne.setOpponent(playerTwo);
         playerTwo.setOpponent(playerOne);
+        MoveHandler.clear();
+        processingMove = false;
 
         String playerNotice;
         if (getLoggedInPlayer().getUsername().equals(playerOne.getUsername())) {
@@ -199,19 +200,39 @@ public class Game {
     }
 
     public void placeMove(Move move) {
+        MoveHandler.addMove(move);
+        System.out.println("placeMove " + move.getPosition());
+    }
+
+
+    public boolean isProcessingMove() {
+        return processingMove;
+    }
+
+    // used by the moveHandler thread
+    public void processMove(Move move) {
         if (isLoggedIn()) {
             if (match.canDoMove()) {
+                processingMove = true;
                 match.addMove(move);
-                board.addMove(move.getPosition(), move.getPlayer().getToken());//match.getTokenByPlayer(move.getPlayer())); //move.getPlayer().getToken());// todo tijdelijke check..
-                update();
-                if (gui.ifShowHelp){
+                board.addMove(move.getPosition(), move.getPlayer().getToken());
+                if (gui.ifShowHelp) {
                     showHelp();
                 }
+                update();
+                // if all is done send response
+                processingMove = false;
+                // get ai next move when the stack is empty
+//                if (moves.empty()) {
+//                    Move aiMove = new Move(actor.getNext(getPossibleMoves()), getLoggedInPlayer());
+//                    CommandSender.addCommand(new MoveCommand(aiMove));
+//                }
             }
         } else {
             // perhaps the reset should happen here.
             // or an empty game gui should be rendered.
         }
+
     }
     
     public void forfeit() {
@@ -223,36 +244,11 @@ public class Game {
 
     public void handleMove(Move move) {
         // If your move is valid
-        if(board.isValidMove(move, move.getPlayer().getToken())) {//match.getTokenByPlayer(move.getPlayer()))) {//move.getPlayer().getToken())) {
+        if(board.isValidMove(move, move.getPlayer().getToken())) {
             CommandSender.addCommand(new MoveCommand(move));
             setYourTurn(false);
             gui.setLeftStatusText("Nice one, valid move!");
         } else { // If your move isn't valid
-            gui.setLeftStatusText("Invalid move!");
-            Platform.runLater(() -> {
-                Alert alert = new InvalidMoveAlert();
-                alert.showAndWait();
-            });
-        }
-    }
-
-    public void handleMove(int movePosition) {
-        Move move = new Move(movePosition, app.getUser());
-        // TODO: 16-4-2017 finish and implement
-        // If it's not your turn
-        /** if(move.getPlayer() != this.playerToMove){
-            Platform.runLater(() -> {
-                Alert alert = new NotYourTurnAlert();
-                alert.showAndWait();
-            });
-        } **/
-        // If your move is valid
-        if(board.isValidMove(move, move.getPlayer().getToken())) {//match.getTokenByPlayer(move.getPlayer()))) {
-            CommandSender.addCommand(new MoveCommand(move));
-            Debug.println("Nice one, valid move");
-            gui.setLeftStatusText("Nice one, valid move!");
-        } else { // If your move isn't valid
-            Debug.println("Invalid move!");
             gui.setLeftStatusText("Invalid move!");
             Platform.runLater(() -> {
                 Alert alert = new InvalidMoveAlert();
