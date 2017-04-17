@@ -241,26 +241,29 @@ public class Game {
         return board.getPossibleMoves(app.getUser());
     }
 
-    public void showHelp(){
+    public void showHelp() {
         removeHelp();
-        for (int x : getPossibleMoves()){
-            int posY = x / 8;
-            int posX = x % 8;
-            board.getBoard()[posY][posX].setTokenState(TokenState.POSSIBLE);
-        }
-        update();
-    }
-
-    public void removeHelp(){
-        for (int y = 0; y < 8; y++)
-        {
-            for (int x = 0; x < 8; x++)
-            {
-                if(getBoard()[y][x].getState() == TokenState.POSSIBLE)
-                    getBoard()[y][x].setTokenState(TokenState.EMPTY);
+        if (isYourTurn()) {
+            for (int pos : getPossibleMoves()) {
+                int posY = pos / getBoard().length;
+                int posX = pos % getBoard().length;
+                if (pos == actor.getNext(getPossibleMoves())) {
+                    getBoard()[posY][posX] = new Token(TokenState.BEST);
+                } else {
+                    getBoard()[posY][posX] = new Token(TokenState.POSSIBLE);//.setTokenState(TokenState.POSSIBLE);
+                }
             }
         }
-        update();
+    }
+
+    public void removeHelp() {
+        for (int y = 0; y < getBoard().length; y++) {
+             for (int x = 0; x < getBoard().length; x++) {
+                 if (getBoard()[y][x].getState() == TokenState.POSSIBLE) {
+                     getBoard()[y][x] = new Token(TokenState.EMPTY);
+                 }
+             }
+        }
     }
 
     public void update() {

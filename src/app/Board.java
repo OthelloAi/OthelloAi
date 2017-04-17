@@ -14,6 +14,7 @@ import static app.TokenState.POSSIBLE;
 
 /**
  * @author Joël Hoekstra
+ * @author Martijn Snijder
  */
 public class Board {
     private Token[][] board = null;
@@ -90,7 +91,8 @@ public class Board {
         TokenState enemyToken = token.getState().opposite();
 
         // Check whether the chosen position is empty or not
-        if (currentMove.getState() == TokenState.EMPTY || currentMove.getState() == TokenState.POSSIBLE) {
+        TokenState currentState = currentMove.getState();
+        if (currentState == TokenState.EMPTY || currentState == TokenState.POSSIBLE || currentState == TokenState.BEST) {
             // Loop through all directions
             for (int x = -1; x <=1; x++) {
                 for (int y = -1; y <= 1; y++) {
