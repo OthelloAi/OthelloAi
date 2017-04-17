@@ -4,6 +4,7 @@ import app.App;
 import app.game.Move;
 import app.network.CommandSender;
 import app.network.commands.MoveCommand;
+import app.utils.ActorState;
 
 /**
  * @author Joël Hoekstra
@@ -21,7 +22,8 @@ public class YourTurnResponse implements Response {
         String message = app.getUser().getUsername() + ", it's your turn";
         app.getGUI().setLeftStatusText(message);
         app.getGame().setYourTurn(true);
-        if(app.getGame().getSActor().equals("MiniMax")) {
+
+        if(app.getGame().getActorState().equals(ActorState.MINIMAX)) {
             int position = app.getGame().getActor().getNext(app.getGame().getPossibleMoves());
             Move move = new Move(position, app.getUser());
             CommandSender.addCommand(new MoveCommand(move));

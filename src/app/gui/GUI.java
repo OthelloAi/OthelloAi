@@ -287,9 +287,9 @@ public class GUI extends BorderPane {
             choices.add("Human");
             ChooseActorDialog<String> dialog = new ChooseActorDialog<>("MiniMax", choices);
             Optional<String> result = dialog.showAndWait();
-            result.ifPresent(chosenActor -> {
-                setLeftStatusText("Actor: " + chosenActor);
-                game.setSActor(chosenActor);
+            result.ifPresent(Actor -> {
+                setLeftStatusText("Actor: " + Actor);
+                game.setActorState(Actor);
             });
         });
         return item;

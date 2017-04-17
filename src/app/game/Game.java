@@ -9,6 +9,7 @@ import app.gui.alerts.*;
 import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
 //import app.network.Connection;
+import app.utils.ActorState;
 import app.utils.Debug;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -36,7 +37,7 @@ public class Game {
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
 
-    private String sActor = "Human";
+    private ActorState actorState = ActorState.HUMAN;
     private Actor actor;
     private Match match = null;
     private App app;
@@ -48,7 +49,6 @@ public class Game {
         this.app = app;
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
-//        actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
     }
 
@@ -72,8 +72,8 @@ public class Game {
         return toUseAI;
     }
 
-    public String getSActor() {
-        return this.sActor;
+    public ActorState getActorState() {
+        return this.actorState;
     }
 
     public Actor getActor() {
@@ -130,22 +130,22 @@ public class Game {
         });
     }
 
-    public void setSActor(String actor) {
-        switch (actor) {
+    public void setActorState(String Actor) {
+        switch (Actor) {
             case "MiniMax" :
                 this.actor = new MiniMaxActor(this, board);
-                this.sActor = actor;
+                this.actorState = ActorState.MINIMAX;
                 break;
             case "Iterative" :
                 this.actor = new IterativeActor();
-                this.sActor = actor;
+                this.actorState = ActorState.ITERATIVE;
                 break;
             case "Random" :
                 this.actor = new RandomActor();
-                this.sActor = actor;
+                this.actorState = ActorState.RANDOM;
                 break;
             case "Human" :
-                this.sActor = actor;
+                this.actorState = ActorState.HUMAN;
         }
     }
     public Match endMatch(EndState endState) {
