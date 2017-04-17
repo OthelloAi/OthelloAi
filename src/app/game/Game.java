@@ -14,8 +14,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import app.network.commands.*;
 import app.gui.GUI;
+import javafx.util.Pair;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Joël Hoekstra
@@ -26,29 +29,22 @@ public class Game {
     private GameType gameType;
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
-    public static Stack<Move> moves;
+    private Stack<Pair<Integer, Board>> boardStates;
     private ActorState actorState = ActorState.HUMAN;
     private Actor actor;
     private Match match = null;
     private App app;
     private boolean yourTurn = false;
-    private boolean processingMove = false;
-    private MoveHandler moveHandler;
 
     private boolean toUseAI = false;
 
     public Game(App app) {
         this.app = app;
-        moves = new Stack<>();
+        boardStates = new Stack<>();
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
         actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
-
-        moveHandler = new MoveHandler(this);
-        Thread moveHandlerThread = new Thread(moveHandler);
-        moveHandlerThread.setDaemon(true);
-        moveHandlerThread.start();
     }
 
     public void setYourTurn(boolean yourTurn) {
@@ -127,14 +123,11 @@ public class Game {
 
     public void addPendingChallenge(Challenge challenge) {
         this.pendingChallenges.add(challenge);
-        //TODO With @Martijn alerts toevoegen.
-        // show dialog here
         Platform.runLater(() -> {
             AcceptDeclineAlert dialog = new AcceptDeclineAlert();
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == ButtonType.OK) {
                 CommandSender.addCommand(new ChallengeAcceptCommand(challenge));
-
             } else {
                 this.pendingChallenges.remove(challenge);
             }
@@ -156,14 +149,14 @@ public class Game {
                 this.actorState = ActorState.RANDOM;
                 break;
             case "Human" :
+                this.actor = new MiniMaxActor(this, board);
                 this.actorState = ActorState.HUMAN;
         }
     }
-    public Match endMatch(EndState endState) {
+    public Match endMatch(GameState gameState) {
 
-        gui.setLeftStatusText("Match has ended.. Thanks for playing. " + endState.name());
-        // TODO: 14/04/2017 add functionality for ending a game here
-//        match.stop();
+        gui.setLeftStatusText("Match has ended.. Thanks for playing. " + gameState.name());
+        match.stop(gameState);
         return match;
     }
 
@@ -174,8 +167,6 @@ public class Game {
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
         playerOne.setOpponent(playerTwo);
         playerTwo.setOpponent(playerOne);
-        MoveHandler.clear();
-        processingMove = false;
 
         String playerNotice;
         if (getLoggedInPlayer().getUsername().equals(playerOne.getUsername())) {
@@ -193,46 +184,40 @@ public class Game {
         });
         setGameType(gameType);
         gui.reset();
-        match = new Match(gameType, playerOne, playerTwo);
+        match = new Match(this, gameType, playerOne, playerTwo);
         match.start();
         update();
         gui.setLeftStatusText(getLoggedInPlayer().getUsername() + ", you have been placed in a new match. And you are " + playerNotice + " Good luck!");
     }
 
-    public void placeMove(Move move) {
-        MoveHandler.addMove(move);
-        System.out.println("placeMove " + move.getPosition());
-    }
-
-
-    public boolean isProcessingMove() {
-        return processingMove;
-    }
-
-    // used by the moveHandler thread
-    public void processMove(Move move) {
-        if (isLoggedIn()) {
-            if (match.canDoMove()) {
-                processingMove = true;
-                match.addMove(move);
-                board.addMove(move.getPosition(), move.getPlayer().getToken());
-                if (gui.ifShowHelp) {
-                    showHelp();
-                }
-                update();
-                // if all is done send response
-                processingMove = false;
-                // get ai next move when the stack is empty
-//                if (moves.empty()) {
-//                    Move aiMove = new Move(actor.getNext(getPossibleMoves()), getLoggedInPlayer());
-//                    CommandSender.addCommand(new MoveCommand(aiMove));
-//                }
+    public void sendAIMove() {
+        if (!match.gameOver(board)) {
+            ArrayList<Integer> possibleMoves = getPossibleMoves();
+            if (possibleMoves.size() > 0) {
+                int position = actor.getNext(possibleMoves);
+                Move move = new Move(position, getLoggedInPlayer());
+////            board.addMove(move.getPosition(), move.getPlayer().getToken());
+                CommandSender.addCommand(new AIMoveCommand(this));
             }
-        } else {
-            // perhaps the reset should happen here.
-            // or an empty game gui should be rendered.
         }
+    }
 
+
+    public void redoLastMove() {
+        if (boardStates.empty()) {
+            return;
+        }
+        Pair boardState = boardStates.pop();
+        System.out.println(boardState.getKey());
+        System.out.println(boardState.getValue());
+    }
+
+    public void processMove(Move move) {
+        if (match != null) {
+            match.addMove(move);
+//            boardStates.push(new Pair(move.getPosition(), new Board(board)));
+        }
+        update();
     }
     
     public void forfeit() {
@@ -280,7 +265,7 @@ public class Game {
     public void removeHelp() {
         for (int y = 0; y < getBoard().length; y++) {
              for (int x = 0; x < getBoard().length; x++) {
-                 if (getBoard()[y][x].getState() == TokenState.POSSIBLE) {
+                 if (getBoard()[y][x].getState() == TokenState.POSSIBLE || getBoard()[y][x].getState() == TokenState.BEST) {
                      getBoard()[y][x] = new Token(TokenState.EMPTY);
                  }
              }

@@ -15,6 +15,8 @@ public class Board {
     private Token[][] board = null;
     private GameType gameType;
 
+    private boolean finishedFlipping = false;
+
     public Board(GameType gameType) {
         this.gameType = gameType;
         generateBoard();
@@ -119,7 +121,7 @@ public class Board {
         return ((x >= 0) && (y >= 0) && (x < board.length) && (y < board.length));
     }
 
-    public void flipColors(int position, Token token) {
+    public boolean flipColors(int position, Token token) {
         int posY = position / board.length;
         int posX = position % board.length;
 
@@ -141,15 +143,21 @@ public class Board {
                     }
                 }
             }
+        return true;
     }
 
     public void clear() {
         board = null;
+        finishedFlipping = false;
         generateBoard();
     }
 
     public Token[][] getBoard() {
         return board;
+    }
+
+    public void setBoard(Token[][] board) {
+        this.board = board;
     }
 
     public Board addMove(int position, Token token) {
@@ -159,10 +167,17 @@ public class Board {
         board[y][x] = token;
 
         if (gameType == GameType.REVERSI) {
-            flipColors(position, token);
+            setFinishedFlipping(flipColors(position, token));
         }
-
         return this;
+    }
+
+    public void setFinishedFlipping(boolean finishedFlipping) {
+        this.finishedFlipping = finishedFlipping;
+    }
+
+    public boolean getFinishedFlipping() {
+        return finishedFlipping;
     }
 
     public ArrayList<Integer> getPossibleMoves(Player player) {
@@ -189,5 +204,9 @@ public class Board {
             result[r] = input[r].clone();
         }
         return result;
+    }
+
+    public Token getTokenOnPosition(int position) {
+        return board[position / board.length][position % board.length];
     }
 }
