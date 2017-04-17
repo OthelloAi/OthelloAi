@@ -5,6 +5,7 @@ package app;
  * Got this idea from @c00kiemon5ter.
  */
 public enum TokenState {
+    BEST('*'),
     BLACK('●'),
     WHITE('○'),
     POSSIBLE('.'),
@@ -32,6 +33,7 @@ public enum TokenState {
     }
 
     public TokenState opposite() {
+        if (this == BEST) return POSSIBLE;
         if (this == CROSS) return NOUGHT;
         if (this == NOUGHT) return CROSS;
         if (this == UP) return DOWN;

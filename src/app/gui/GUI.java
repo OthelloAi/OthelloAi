@@ -11,6 +11,7 @@ import app.game.Player;
 import app.gui.dialogs.*;
 import app.network.CommandSender;
 import app.utils.Config;
+import app.utils.Debug;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -114,6 +115,7 @@ public class GUI extends BorderPane {
                 vBox.setMargin(gameGUI, new Insets(20, 20,  20, 20));
                 setCenter(vBox);
 //                setCenter(gameGUI);
+                game.showHelp();
                 gameGUI.render();
             }
         }
@@ -254,9 +256,9 @@ public class GUI extends BorderPane {
     public MenuItem menuItemHelp(){
         final MenuItem item = new MenuItem("Help");
         item.setOnAction(e -> {
-            System.out.println(ifShowHelp);
+            Debug.println(ifShowHelp);
             if(ifShowHelp){
-                System.out.println(ifShowHelp);
+                Debug.println(ifShowHelp);
                 ifShowHelp = false;
                 game.removeHelp();
 
