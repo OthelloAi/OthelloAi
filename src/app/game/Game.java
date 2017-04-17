@@ -102,6 +102,18 @@ public class Game {
 
     public ArrayList<Player> getPlayerList() {return playerList;}
 
+    public int getScore(Player player) {
+        int score = 0;
+        Token[][] b = board.getBoard();
+        for (int y = 0; y < b.length; y++) {
+            for (int x = 0; x < b.length; x++) {
+                if (board.getBoard()[y][x].getState() == player.getToken().getState()) {
+                    score++;
+                }
+            }
+        }
+        return score;
+    }
 
     public Token[][] getBoard() {
         return board.getBoard();
@@ -179,7 +191,6 @@ public class Game {
             startMatchAlert.showAndWait();
         });
         setGameType(gameType);
-//        board = new Board(gameType); // TODO: 14/04/2017 create unique board types for tic tac toe and for reversi
         gui.reset();
         match = new Match(gameType, playerOne, playerTwo);
         match.start();
@@ -191,11 +202,13 @@ public class Game {
         if (isLoggedIn()) {
             if (match.canDoMove()) {
                 match.addMove(move);
-                board.addMove(move.getPosition(), match.getTokenByPlayer(move.getPlayer())); //move.getPlayer().getToken());// todo tijdelijke check..
+                board.addMove(move.getPosition(), move.getPlayer().getToken());//match.getTokenByPlayer(move.getPlayer())); //move.getPlayer().getToken());// todo tijdelijke check..
                 update();
+                if (gui.ifShowHelp){
+                    showHelp();
+                }
             }
-        }
-        else {
+        } else {
             // perhaps the reset should happen here.
             // or an empty game gui should be rendered.
         }
@@ -248,24 +261,34 @@ public class Game {
         }
     }
 
-    // TODO: 16-4-2017 Finish and implement
     // TODO: 16/04/2017 MOVED TO BOARD but here for backwards compatibility.. DEPRECATED.
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves(app.getUser());
-//        ArrayList<Integer> possibleMoves = new ArrayList<>();
-//        for (int y = 0; y < 8; y++) {
-//            for (int x = 0; x < 8; x++) {
-//                int position = (y * 8) + x;
-//                Move move = new Move(position, app.getUser());
-//                if (board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
-//                    possibleMoves.add(move.getPosition());
-//                    // TODO: 16-4-2017 implement
-//                    // board.getBoard()[y][x].setTokenState(TokenState.POSSIBLE);
-//                }
-//            }
-//        }
-//        Debug.println("Possible moves: " + Arrays.toString(possibleMoves.toArray()));
-//        return possibleMoves;
+    }
+
+    public void showHelp() {
+        removeHelp();
+        if (isYourTurn()) {
+            for (int pos : getPossibleMoves()) {
+                int posY = pos / getBoard().length;
+                int posX = pos % getBoard().length;
+                if (pos == actor.getNext(getPossibleMoves())) {
+                    getBoard()[posY][posX] = new Token(TokenState.BEST);
+                } else {
+                    getBoard()[posY][posX] = new Token(TokenState.POSSIBLE);//.setTokenState(TokenState.POSSIBLE);
+                }
+            }
+        }
+    }
+
+    public void removeHelp() {
+        for (int y = 0; y < getBoard().length; y++) {
+             for (int x = 0; x < getBoard().length; x++) {
+                 if (getBoard()[y][x].getState() == TokenState.POSSIBLE) {
+                     getBoard()[y][x] = new Token(TokenState.EMPTY);
+                 }
+             }
+        }
     }
 
     public void update() {
