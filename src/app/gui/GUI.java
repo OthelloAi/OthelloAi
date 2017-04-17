@@ -2,7 +2,6 @@ package app.gui;
 
 import app.*;
 
-import java.awt.*;
 import java.util.List;
 
 import app.game.Game;
@@ -12,7 +11,6 @@ import app.game.Player;
 import app.gui.dialogs.*;
 import app.network.CommandSender;
 import app.utils.Config;
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -29,12 +27,13 @@ import app.network.commands.*;
 import java.util.Optional;
 import java.util.ArrayList;
 import javafx.scene.layout.*;
-import javafx.event.ActionEvent;
 import javafx.application.Platform;
 
 /**
  * @author Joël Hoekstra
  * @author Robert Zandberg
+ * @author Martijn Snijder
+ * @author Gabe Witteveen
  */
 public class GUI extends BorderPane {
 
@@ -98,6 +97,7 @@ public class GUI extends BorderPane {
             }
         });
     }
+
     private void createStatusBar() {
         HBox hBox = new HBox();
         hBox.getChildren().addAll(leftStatus);
@@ -201,7 +201,9 @@ public class GUI extends BorderPane {
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(movePosition -> {
                 setLeftStatusText("Made the move " + movePosition);
-                game.handleMove(Integer.parseInt(movePosition));
+                int position = Integer.parseInt(movePosition);
+                Move move = new Move(position, app.getUser());
+                game.handleMove(move);
             });
         });
         return item;
@@ -257,9 +259,11 @@ public class GUI extends BorderPane {
             choices.add("Tic-tac-toe");
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
             setLeftStatusText("Subscribing...");
+//            game.useAI(false);
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(gameType -> {
                 setLeftStatusText("Subscribed to " + gameType + ". Waiting for opponent..");
+//                game.useAI(true);
                 CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
             });
         });
@@ -273,15 +277,19 @@ public class GUI extends BorderPane {
     }
 
     private void handleMouseClick(MouseEvent e){
-        Double doubleX = e.getX();
-        Double doubleY = e.getY();
-        int intX = doubleX.intValue();
-        int intY = doubleY.intValue();
-        int posX = (intX / gameGUI.tileSize);
-        int posY = (intY / gameGUI.tileSize);
-        int position = (posY * this.boardLength) + posX;
-        if (posX < this.boardLength && posY < this.boardLength) {
-            game.handleMove(position);
+        if (game.isYourTurn()) {
+            Double doubleX = e.getX();
+            Double doubleY = e.getY();
+            int intX = doubleX.intValue();
+            int intY = doubleY.intValue();
+            int posX = (intX / gameGUI.tileSize);
+            int posY = (intY / gameGUI.tileSize);
+            int position = (posY * this.boardLength) + posX;
+            if (posX < this.boardLength && posY < this.boardLength) {
+                Move move = new Move(position, game.getLoggedInPlayer());
+                game.handleMove(move);
+//            game.handleMove(position);
+            }
         }
     }
 

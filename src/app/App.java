@@ -8,6 +8,7 @@ import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
 import app.network.Connection;
 import app.network.commands.LogoutCommand;
+import app.utils.Debug;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -22,7 +23,8 @@ import java.util.regex.Pattern;
  * @author Joël Hoekstra
  */
 public class App extends Application {
-
+    //https://www.mkyong.com/java/how-to-detect-os-in-java-systemgetpropertyosname/
+    private static String OS = System.getProperty("os.name").toLowerCase();
     private ArrayList<Stage> stages = new ArrayList<>();
     private Connection connection = Connection.getInstance();
     private CommandSender sender;
@@ -34,6 +36,7 @@ public class App extends Application {
     private ArrayList<Player> onlinePlayers = new ArrayList<>();
 
     public App() {
+        Debug.debug(false);
         game = new Game(this);
         connection.connect();
     }
@@ -80,7 +83,9 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
         stage.show();
-        stage.setResizable(false);
+        if (OS.indexOf("win") >= 0) {
+            stage.setResizable(false);
+        }
         stage.setOnCloseRequest(e -> {
             stop();
         });
