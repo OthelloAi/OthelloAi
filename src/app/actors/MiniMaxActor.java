@@ -4,6 +4,7 @@ import app.*;
 import app.exceptions.NotARealMoveException;
 import app.game.Game;
 import app.game.Player;
+import app.utils.Debug;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -43,8 +44,8 @@ public class MiniMaxActor implements Actor {
         this.player = game.getLoggedInPlayer();
         board.print();
         Board b = new Board(game.getBoardObj());
-        System.out.println("cloned board gametype: " + b.getGameType());
-        System.out.println(player.getToken() + " -> " + player.getUsername() + " -> " + player.getOpponent().getUsername() + " -> " + player.getOpponent().getToken());
+        Debug.println("cloned board gametype: " + b.getGameType());
+        Debug.println(player.getToken() + " -> " + player.getUsername() + " -> " + player.getOpponent().getUsername() + " -> " + player.getOpponent().getToken());
         int move;
         try {
             move = getMove(player, b);
@@ -85,36 +86,29 @@ public class MiniMaxActor implements Actor {
     }
 
     private int getMaxValue() {
-        // sum(
-        //  map(abs, SQUARE_WEIGHTS)
-        // )
-//        ArrayList<Integer> absWeights = new ArrayList<>();
-//        for (int i = 0; i < weights.length; i++) {
-//            absWeights.add(Math.abs(weights[i]));
-//        }
         int[] absWeights = new int[weights.length];
         for (int i = 0; i < weights.length; i++) {
             absWeights[i] = Math.abs(weights[i]);
         }
 
         int sum = IntStream.of(weights).sum(); // http://stackoverflow.com/a/17846520
-        System.out.println("getMaxValue: " + sum);
+        Debug.println("getMaxValue: " + sum);
         return sum;
     }
 
     private int getMinValue() {
         int minValue = -getMaxValue();
-        System.out.println("getMinValue: " + minValue);
+        Debug.println("getMinValue: " + minValue);
         return minValue;
     }
 
     private int maxScore(Player player, Board b) {
         ArrayList<Integer> moves = b.getPossibleMoves(player);
         int[] scores = new int[moves.size()];
-        System.out.println("SCORES: ");
+        Debug.println("SCORES: ");
         for (int i = 0; i < moves.size(); i++) {
             scores[i] = scoreMove(player, b.addMove(i, player.getToken()));
-            System.out.println("move " + moves.get(i) + " - i: " + i + " score: " + scores[i]);
+            Debug.println("move " + moves.get(i) + " - i: " + i + " score: " + scores[i]);
         }
 
         int max = getMax(scores);
