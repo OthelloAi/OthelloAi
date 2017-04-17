@@ -63,6 +63,7 @@ public class GUI extends BorderPane {
         if (game.isLoggedIn()) {
             menuFile.getItems().addAll(
                     menuItemSubscribe(),
+                    menuItemChooseActor(),
                     menuItemAllPlayers(),
                     menuItemChallenge(),
                     menuItemLogout()
@@ -310,6 +311,24 @@ public class GUI extends BorderPane {
         return item;
     }
 
+    private MenuItem menuItemChooseActor() {
+        MenuItem item = new MenuItem("Choose Actor");
+        item.setOnAction(e -> {
+            List<String> choices = new ArrayList<>();
+            choices.add("MiniMax");
+//            choices.add("Iterative");
+//            choices.add("Random");
+            choices.add("Human");
+            ChooseActorDialog<String> dialog = new ChooseActorDialog<>("MiniMax", choices);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(Actor -> {
+                setLeftStatusText("Actor: " + Actor);
+                game.setActorState(Actor);
+            });
+        });
+        return item;
+    }
+  
     public void handleMouseClick(int x, int y){
         if (game.isYourTurn()) {
             Move move = new Move((y * boardLength + x), game.getLoggedInPlayer());
