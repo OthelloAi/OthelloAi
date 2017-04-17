@@ -7,6 +7,7 @@ import app.gui.alerts.*;
 import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
 import app.network.Connection;
+import app.utils.Debug;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -45,6 +46,7 @@ public class Game {
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
         actor = new MiniMaxActor(this, board);
+        Debug.log("I am debugging now <3");
     }
 
     public void setYourTurn(boolean yourTurn) {

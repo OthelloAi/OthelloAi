@@ -8,6 +8,7 @@ import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
 import app.network.Connection;
 import app.network.commands.LogoutCommand;
+import app.utils.Debug;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -35,6 +36,7 @@ public class App extends Application {
     private ArrayList<Player> onlinePlayers = new ArrayList<>();
 
     public App() {
+        Debug.debug(false);
         game = new Game(this);
         connection.connect();
     }
