@@ -12,16 +12,18 @@ import javafx.scene.control.Dialog;
  */
 public class AcceptDeclineAlert extends Alert{
     String gameType;
+    String challenger;
 
     public AcceptDeclineAlert(Challenge challenge){
         super(AlertType.CONFIRMATION);
         Challenge inviteChallenge = challenge;
+        challenger = inviteChallenge.getChallenger().toString();
         if (inviteChallenge.getGameType().toString().equals("REVERSI"))
             gameType = "Reversi";
         else
             gameType = "Tic-Tac-Toe";
         setTitle("New invite");
-        setHeaderText("You got invited for a game of " + gameType + "!");
+        setHeaderText(challenger + " invited you for a game of " + gameType + "!");
         setContentText("Please accept or decline this challenge");
         Button okButton = (Button) getDialogPane().lookupButton( ButtonType.OK );
         okButton.setText("Accept");
