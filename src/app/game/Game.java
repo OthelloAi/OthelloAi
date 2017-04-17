@@ -2,11 +2,13 @@ package app.game;
 
 import app.*;
 import app.actors.Actor;
+import app.actors.IterativeActor;
 import app.actors.MiniMaxActor;
+import app.actors.RandomActor;
 import app.gui.alerts.*;
 import app.gui.dialogs.ConnectionDialog;
 import app.network.CommandSender;
-import app.network.Connection;
+//import app.network.Connection;
 import app.utils.Debug;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -34,6 +36,7 @@ public class Game {
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
 
+    private String sActor = "Human";
     private Actor actor;
     private Match match = null;
     private App app;
@@ -45,7 +48,7 @@ public class Game {
         this.app = app;
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
-        actor = new MiniMaxActor(this, board);
+//        actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
     }
 
@@ -67,6 +70,10 @@ public class Game {
 
     public boolean usesAI() {
         return toUseAI;
+    }
+
+    public String getSActor() {
+        return this.sActor;
     }
 
     public Actor getActor() {
@@ -122,7 +129,25 @@ public class Game {
             }
         });
     }
-    
+
+    public void setSActor(String actor) {
+        switch (actor) {
+            case "MiniMax" :
+                this.actor = new MiniMaxActor(this, board);
+                this.sActor = actor;
+                break;
+            case "Iterative" :
+                this.actor = new IterativeActor();
+                this.sActor = actor;
+                break;
+            case "Random" :
+                this.actor = new RandomActor();
+                this.sActor = actor;
+                break;
+            case "Human" :
+                this.sActor = actor;
+        }
+    }
     public Match endMatch(EndState endState) {
 
         gui.setLeftStatusText("Match has ended.. Thanks for playing. " + endState.name());
@@ -246,4 +271,5 @@ public class Game {
     public void update() {
         gui.update();
     }
+
 }

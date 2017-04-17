@@ -59,6 +59,7 @@ public class GUI extends BorderPane {
         if (game.isLoggedIn()) {
             menuFile.getItems().addAll(
                     menuItemSubscribe(),
+                    menuItemChooseActor(),
                     menuItemAllPlayers(),
                     menuItemChallenge(),
                     menuItemLogout()
@@ -273,6 +274,24 @@ public class GUI extends BorderPane {
     private MenuItem menuItemLogout() {
         MenuItem item = new MenuItem("Logout");
         item.setOnAction(e -> app.stop());
+        return item;
+    }
+
+    private MenuItem menuItemChooseActor() {
+        MenuItem item = new MenuItem("Choose Actor");
+        item.setOnAction(e -> {
+            List<String> choices = new ArrayList<>();
+            choices.add("MiniMax");
+//            choices.add("Iterative");
+//            choices.add("Random");
+            choices.add("Human");
+            ChooseActorDialog<String> dialog = new ChooseActorDialog<>("MiniMax", choices);
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent(chosenActor -> {
+                setLeftStatusText("Actor: " + chosenActor);
+                game.setSActor(chosenActor);
+            });
+        });
         return item;
     }
 
