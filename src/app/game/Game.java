@@ -130,11 +130,10 @@ public class Game {
         //TODO With @Martijn alerts toevoegen.
         // show dialog here
         Platform.runLater(() -> {
-            AcceptDeclineAlert dialog = new AcceptDeclineAlert();
+            AcceptDeclineAlert dialog = new AcceptDeclineAlert(challenge);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == ButtonType.OK) {
                 CommandSender.addCommand(new ChallengeAcceptCommand(challenge));
-
             } else {
                 this.pendingChallenges.remove(challenge);
             }

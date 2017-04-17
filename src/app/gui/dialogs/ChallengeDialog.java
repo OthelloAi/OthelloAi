@@ -5,6 +5,7 @@ import app.game.Game;
 import app.game.Player;
 import app.network.CommandSender;
 import app.network.commands.PlayerListCommand;
+import app.utils.Debug;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -34,25 +35,34 @@ public class ChallengeDialog extends Dialog {
         Dialog<Pair<String, String>> dialog = new Dialog<>();
         dialog.setTitle("Challenge Dialog");
 
-        // Set the button types.
-        ButtonType challengeButtonType = new ButtonType("Challenge", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(challengeButtonType, ButtonType.CANCEL);
-
         // Create the username and gametype labels and fields.
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
+        // Set the button types.
+        ButtonType challengeButtonType = new ButtonType("Challenge", ButtonBar.ButtonData.OK_DONE);
+
         ComboBox<String> userbox = new ComboBox<>();
         ArrayList<Player> playerList = app.getOnlinePlayers();
 
         if (playerList != null) { // catch an none existing arraylist
             for (Player player : playerList) {
-                userbox.getItems().add(player.getUsername());
+                if (!player.getUsername().equals(app.getUser().getUsername())) {
+                    userbox.getItems().add(player.getUsername());
+                }
+            }
+            if (userbox.getItems().toString().equals("[]")) {
+                grid.add(new Label("You are the only online player!"), 1, 3);
+                dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL);
+            }
+            else{
+                dialog.getDialogPane().getButtonTypes().addAll(challengeButtonType, ButtonType.CANCEL);
             }
             userbox.getSelectionModel().selectFirst();
         }
+
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("Reversi", "Tic-tac-toe");
         comboBox.getSelectionModel().selectFirst();
