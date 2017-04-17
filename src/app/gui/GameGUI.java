@@ -57,7 +57,7 @@ public class GameGUI extends GridPane {
                         GridNode node = new GridNode(board[y][x]);
                         int posX = x;
                         int posY = y;
-                        node.setOnMouseClicked(e -> gui.handleMouseClick(node, posX, posY));
+                        node.setOnMouseClicked(e -> gui.handleMouseClick(posX, posY));
                         add(node, x, y);
                     }
                 }
