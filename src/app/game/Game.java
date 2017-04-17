@@ -95,6 +95,18 @@ public class Game {
 
     public ArrayList<Player> getPlayerList() {return playerList;}
 
+    public int getScore(Player player) {
+        int score = 0;
+        Token[][] b = board.getBoard();
+        for (int y = 0; y < b.length; y++) {
+            for (int x = 0; x < b.length; x++) {
+                if (board.getBoard()[y][x].getState() == player.getToken().getState()) {
+                    score++;
+                }
+            }
+        }
+        return score;
+    }
 
     public Token[][] getBoard() {
         return board.getBoard();

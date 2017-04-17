@@ -112,8 +112,6 @@ public class MiniMaxActor implements Actor {
         }
 
         int max = getMax(scores);
-
-//        OptionalInt max = IntStream.of(scores).max();
         return moves.get(max);
     }
 
@@ -183,10 +181,5 @@ public class MiniMaxActor implements Actor {
             }
         }
         return total;
-    }
-
-
-    private int minimax(Token[][] b) {
-        return -1;
     }
 }

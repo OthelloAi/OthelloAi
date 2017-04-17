@@ -20,7 +20,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import app.network.commands.*;
@@ -49,6 +48,7 @@ public class GUI extends BorderPane {
         this.app = app;
         this.game = app.getGame();
         game.addGUI(this);
+        gameGUI = new GameGUI(this);
         render();
     }
 
@@ -81,18 +81,17 @@ public class GUI extends BorderPane {
             createStatusBar();
             if (game.isLoggedIn()) {
                 if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
-                    gameGUI = new OthelloGUI(game.getBoard());
+                    gameGUI = new GameGUI(game.getBoard(), this);
                     this.boardLength = 8;
                     setCenter(gameGUI);
                 }
                 if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
-                    gameGUI = new TicTacToeGUI(game.getBoard());
+                    gameGUI = new GameGUI(game.getBoard(), this);
                     this.boardLength = 3;
                     setCenter(gameGUI);
                 }
                 if (gameGUI != null) {
                     gameGUI.render();
-                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
                 }
             }
         });
@@ -100,7 +99,7 @@ public class GUI extends BorderPane {
 
     private void createStatusBar() {
         HBox hBox = new HBox();
-        hBox.getChildren().addAll(leftStatus);
+        hBox.getChildren().add(leftStatus);
         setBottom(hBox);
     }
 
@@ -276,19 +275,21 @@ public class GUI extends BorderPane {
         return item;
     }
 
-    private void handleMouseClick(MouseEvent e){
+    public void handleMouseClick(GridNode node, final int x, final int y){
         if (game.isYourTurn()) {
-            Double doubleX = e.getX();
-            Double doubleY = e.getY();
-            int intX = doubleX.intValue();
-            int intY = doubleY.intValue();
-            int posX = (intX / gameGUI.tileSize);
-            int posY = (intY / gameGUI.tileSize);
-            int position = (posY * this.boardLength) + posX;
-            if (posX < this.boardLength && posY < this.boardLength) {
-                Move move = new Move(position, game.getLoggedInPlayer());
-                game.handleMove(move);
-            }
+            Move move = new Move((y * boardLength + x), game.getLoggedInPlayer());
+            game.handleMove(move);
+//            Double doubleX = e.getX();
+//            Double doubleY = e.getY();
+//            int intX = doubleX.intValue();
+//            int intY = doubleY.intValue();
+//            int posX = (intX / gameGUI.tileSize);
+//            int posY = (intY / gameGUI.tileSize);
+//            int position = (posY * this.boardLength) + posX;
+//            if (posX < this.boardLength && posY < this.boardLength) {
+//                Move move = new Move(position, game.getLoggedInPlayer());
+//                game.handleMove(move);
+//            }
         }
     }
 

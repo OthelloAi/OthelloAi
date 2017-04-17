@@ -36,7 +36,7 @@ public class App extends Application {
     private ArrayList<Player> onlinePlayers = new ArrayList<>();
 
     public App() {
-        Debug.canPrint(false);
+        Debug.canPrint(true);
         game = new Game(this);
         connection.connect();
     }
@@ -83,9 +83,10 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
         stage.show();
-        if (OS.indexOf("win") >= 0) {
+
+//        if (OS.indexOf("win") >= 0) {
             stage.setResizable(false);
-        }
+//        }
         stage.setOnCloseRequest(e -> {
             stop();
         });
