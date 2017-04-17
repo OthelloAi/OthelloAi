@@ -1,6 +1,7 @@
 package app.network;
 
 import app.Protocol;
+import app.utils.Debug;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -30,7 +31,7 @@ public class Connection implements Protocol {
         try {
             socket = new Socket(hostName, portNumber);
         } catch (IOException e) {
-            System.out.println("Error while attempting to establish a connection");
+            Debug.println("Error while attempting to establish a connection");
         } catch (Exception e) {
             e.printStackTrace();
         }

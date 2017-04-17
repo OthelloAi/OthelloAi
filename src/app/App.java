@@ -36,7 +36,7 @@ public class App extends Application {
     private ArrayList<Player> onlinePlayers = new ArrayList<>();
 
     public App() {
-        Debug.debug(false);
+        Debug.canPrint(false);
         game = new Game(this);
         connection.connect();
     }

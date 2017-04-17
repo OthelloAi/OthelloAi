@@ -11,7 +11,7 @@ public class Move {
         this.position = position;
         this.player = player;
         // TODO: 16-4-2017 Removed cause of console spam caused bij getpossiblemoves
-        // System.out.println("Move: " + position);
+        // Debug.println("Move: " + position);
     }
 
     public Player getPlayer() {

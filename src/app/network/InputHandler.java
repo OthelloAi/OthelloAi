@@ -9,6 +9,7 @@ import app.network.commands.LoginCommand;
 import app.network.commands.SubscribeCommand;
 import app.network.responses.*;
 import app.utils.Config;
+import app.utils.Debug;
 
 import java.io.BufferedReader;
 import java.net.SocketException;
@@ -36,9 +37,7 @@ public class InputHandler implements Runnable {
     }
 
     private Response parseResponse(String responseString) {
-//        System.out.println("IN: " + responseString);
         if (responseString.startsWith("SVR")) {
-//            System.out.println("SERVER MESSAGE: " + responseString);
             if (responseString.startsWith("GAMELIST", 4)) {
                 ArrayList<String> params = parseParameters(responseString.substring(14));
                 return new GameListResponse(params);
@@ -51,83 +50,36 @@ public class InputHandler implements Runnable {
 
             if (responseString.startsWith("GAME MATCH", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(16, responseString.length() - 1));
-                System.out.println("game match, params:");
-                for (String key : params.keySet()) {
-                    System.out.println(key + ": " + params.get(key));
-                }
-                // response = SVR GAME MATCH {PLAYERTOMOVE: "username", GAMETYPE: "gameTypeName", OPPONENT: "username"}
                 return new GameMatchResponse(app, params);
             }
 
             if (responseString.startsWith("GAME YOURTURN", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(19, responseString.length() - 1));
-                // do your move here
-                // @todo remove this later because @Martijn has made this.
-//                System.out.println("game YOURTURN, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
-
                 return new YourTurnResponse(app);
-                // response = SVR GAME YOURTURN {TURNMESSAGE: ""}
-//                return new YourTurnResponse();
             }
 
             if (responseString.startsWith("GAME CHALLENGE", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(20, responseString.length() - 1));
-//                System.out.println("game challenge, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
                 return new ChallengeResponse(app, params);
             }
 
             if (responseString.startsWith("GAME MOVE", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(15, responseString.length() - 1));
-//                System.out.println("game MOVE, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
-                // SVR GAME MOVE {PLAYER: "username", MOVE: "5", DETAILS: ""}
                 return new ReceiveMoveResponse(app, params);
             }
 
             if (responseString.startsWith("GAME WIN", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(14, responseString.length() - 1));
-//                System.out.println("game WIN, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
-                // SVR GAME WIN {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
-                // PLAYERONESCORE
-                // PLAYERTWOSCORE
-                // COMMENT
                 return new GameWinResponse(app, params);
             }
 
             if (responseString.startsWith("GAME DRAW", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(15, responseString.length() - 1));
-//                System.out.println("game DRAW, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
-                // SVR GAME DRAW {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Client disconnected"}
-                // PLAYERONESCORE
-                // PLAYERTWOSCORE
-                // COMMENT
                 return new GameDrawResponse(app, params);
             }
 
             if (responseString.startsWith("GAME LOSS", 4)) {
                 Map<String, String> params = parseAssocParams(responseString.substring(15, responseString.length() - 1));
-//                System.out.println("game LOSS, params:");
-//                for (String key : params.keySet()) {
-//                    System.out.println(key + ": " + params.get(key));
-//                }
-                // response = SVR GAME LOSS {PLAYERONESCORE: "0", PLAYERTWOSCORE: "0", COMMENT: "Player forfeited match"}
-                // PLAYERONESCORE
-                // PLAYERTWOSCORE
-                // COMMENT
                 return new GameLossResponse(app, params);
             }
         } else if (responseString.equals("OK")) {
@@ -137,7 +89,6 @@ public class InputHandler implements Runnable {
                 sender.getOldestSentCommand();
                 return handleErrorResponse(responseString);
             }
-//            if (responseString.startsWith("DUPLICATE NAME"))
         }
         return new NullResponse();
     }
@@ -171,13 +122,13 @@ public class InputHandler implements Runnable {
             try {
                 if ((responseString = reader.readLine()) != null) {
                     response = parseResponse(responseString);
-                    System.out.println(response);
+//                    Debug.println(response);
                     if (response != null) {
                         response.handle();
                     }
                 }
             } catch (SocketException e) {
-                System.err.println("Socket was closed " + e);
+                Debug.println("Socket was closed " + e);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -190,7 +141,7 @@ public class InputHandler implements Runnable {
         Matcher m = p.matcher(params);
         while (m.find()) {
             String group = m.group(1);
-            System.out.println("ParseParams -> group: " + group);
+//            Debug.println("ParseParams -> group: " + group);
             list.add(group);
         }
         return list;
@@ -202,7 +153,7 @@ public class InputHandler implements Runnable {
         for (int i = 0; i < explodedParams.length; i++) {
             String[] keyValue = explodedParams[i].split(": ");
             String key = keyValue[0];
-            System.out.println("keyValue[1]: " + keyValue[1]);
+//            Debug.println("keyValue[1]: " + keyValue[1]);
             String value = keyValue[1].substring(1, keyValue[1].length() - 1);
             map.put(key, value);
         }

@@ -46,7 +46,7 @@ public class Game {
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
         actor = new MiniMaxActor(this, board);
-        Debug.log("I am debugging now <3");
+        Debug.println("I am debugging now <3");
     }
 
     public void setYourTurn(boolean yourTurn) {
@@ -142,13 +142,13 @@ public class Game {
         String playerNotice;
         if (getLoggedInPlayer().getUsername().equals(playerOne.getUsername())) {
             playerNotice = "Player one -> "  + TokenState.BLACK.toString();
-            System.out.println("You are player one with token " + TokenState.BLACK.toString());
+            Debug.println("You are player one with token " + TokenState.BLACK.toString());
         } else {
             playerNotice = "Player two -> "  + TokenState.WHITE.toString();
-            System.out.println("You are player two with token " + TokenState.WHITE.toString());
+            Debug.println("You are player two with token " + TokenState.WHITE.toString());
         }
 
-        System.out.println(getLoggedInPlayer().getUsername() + " you're placed in a new match..");
+        Debug.println(getLoggedInPlayer().getUsername() + " you're placed in a new match..");
         Platform.runLater(() -> {
             StartMatchAlert startMatchAlert = new StartMatchAlert();
             startMatchAlert.showAndWait();
@@ -211,10 +211,10 @@ public class Game {
         // If your move is valid
         if(board.isValidMove(move, move.getPlayer().getToken())) {//match.getTokenByPlayer(move.getPlayer()))) {
             CommandSender.addCommand(new MoveCommand(move));
-            System.out.println("Nice one, valid move");
+            Debug.println("Nice one, valid move");
             gui.setLeftStatusText("Nice one, valid move!");
         } else { // If your move isn't valid
-            System.out.println("Invalid move!");
+            Debug.println("Invalid move!");
             gui.setLeftStatusText("Invalid move!");
             Platform.runLater(() -> {
                 Alert alert = new InvalidMoveAlert();
@@ -239,7 +239,7 @@ public class Game {
 //                }
 //            }
 //        }
-//        System.out.println("Possible moves: " + Arrays.toString(possibleMoves.toArray()));
+//        Debug.println("Possible moves: " + Arrays.toString(possibleMoves.toArray()));
 //        return possibleMoves;
     }
 

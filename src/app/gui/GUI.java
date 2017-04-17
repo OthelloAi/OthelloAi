@@ -288,7 +288,6 @@ public class GUI extends BorderPane {
             if (posX < this.boardLength && posY < this.boardLength) {
                 Move move = new Move(position, game.getLoggedInPlayer());
                 game.handleMove(move);
-//            game.handleMove(position);
             }
         }
     }

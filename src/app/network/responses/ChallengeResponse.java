@@ -5,6 +5,7 @@ import app.Challenge;
 import app.game.GameType;
 import app.utils.Config;
 import app.game.Game;
+import app.utils.Debug;
 
 import java.util.Map;
 
@@ -33,6 +34,6 @@ public class ChallengeResponse implements Response {
 //        challenge.setId(Integer.parseInt(params.get("CHALLENGENUMBER")));
         app.getGame().addPendingChallenge(challenge);
         // TODO: 14/04/2017 how can this be improved?
-        System.out.println("challenge has been send");
+        Debug.println("challenge has been send");
     }
 }

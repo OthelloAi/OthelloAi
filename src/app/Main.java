@@ -1,7 +1,5 @@
 package app;
 
-import app.game.Game;
-import app.App;
 import javafx.application.Application;
 import java.io.IOException;
 
@@ -10,10 +8,7 @@ import java.io.IOException;
  * @author Joël Hoekstra
  */
 public class Main {
-
     public static void main(String[] args) throws IOException {
-//        System.out.println("Welcome to the AI of the future.");
-//        Application.launch(Game.class, args);
         Application.launch(App.class, args);
     }
 }

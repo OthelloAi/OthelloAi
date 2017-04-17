@@ -5,6 +5,7 @@ import app.game.Move;
 import app.game.MoveExplorer;
 import app.game.Player;
 import app.network.responses.YourTurnResponse;
+import app.utils.Debug;
 
 import java.awt.*;
 import java.util.*;
@@ -35,17 +36,17 @@ public class Board {
 
     public void print() {
         if (board == null) {
-            System.out.println("BOARD IS NULL");
+            Debug.println("BOARD IS NULL");
             return;
         }
-        System.out.println();
+        Debug.println();
         for (int y = 0; y < board.length; y++) {
             for (int x = 0; x < board.length; x++) {
-                System.out.print(" " + board[y][x]);
+                Debug.print(" " + board[y][x]);
             }
-            System.out.println();
+            Debug.println();
         }
-        System.out.println();
+        Debug.println();
     }
     public GameType getGameType() {
         return gameType;
@@ -96,8 +97,8 @@ public class Board {
                     int offset = 1; // Used to look further into the same direction
 
                     while (inBounds(posX + (x * offset), posY + (y * offset)) && board[posY + (y * offset)][posX + (x * offset)].getState() == enemyToken) { // While there are tokens in opposite color in a direction
-//                        System.out.println(position + " -> " + (posY + (y * offset)));
-//                        System.out.println(position + " -> " + (posX + (x * offset)));
+//                        Debug.println(position + " -> " + (posY + (y * offset)));
+//                        Debug.println(position + " -> " + (posX + (x * offset)));
                         offset++; // Add 1 to offset
                     }
                     if (offset == 1) // If the offset is still equal to one, meaning that there were no opposite tokens found, continue in the loop
@@ -174,7 +175,7 @@ public class Board {
             for (int x = 0; x < board.length; x++) {
                 int position = y * board.length + x;
                 Move move = new Move(position, player);
-//                System.out.println("player -> " + player.getUsername() + " with token -> " + player.getToken());
+//                Debug.println("player -> " + player.getUsername() + " with token -> " + player.getToken());
                 if (isValidMove(move, player.getToken())) {
                     possibleMoves.add(move.getPosition());
                 }

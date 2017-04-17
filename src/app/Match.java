@@ -4,6 +4,7 @@ import app.game.GameState;
 import app.game.GameType;
 import app.game.Move;
 import app.game.Player;
+import app.utils.Debug;
 
 import java.util.ArrayList;
 
@@ -38,14 +39,12 @@ public class Match {
         addPlayerTwo(playerTwo);
         playerTwo.setToken(getTokenByPlayer(playerTwo));
 
-//        System.out.println("Player One: " + playerOne.getUsername());
-//        System.out.println("Player Two: " + playerTwo.getUsername());
         activePlayer = playerOne;
     }
 
     public void addMove(Move move) {
         moves.add(move);
-        System.out.println("Player: " + move.getPlayer().getUsername() + " made move: " + move.getPosition());
+        Debug.println("Player: " + move.getPlayer().getUsername() + " made move: " + move.getPosition());
         if (playerOne.getUsername().equals(move.getPlayer().getUsername())) {
             activePlayer = playerTwo;
         } else if (playerTwo.getUsername().equals(move.getPlayer().getUsername())) {
