@@ -182,6 +182,7 @@ public class GUI extends BorderPane {
             ListView lv = new ListView();
             Platform.runLater(() -> {
                 for (Player player : app.getOnlinePlayers()) {
+
                     lv.getItems().add(player.getUsername());
                 }
             });
@@ -203,13 +204,18 @@ public class GUI extends BorderPane {
 
             lv.setOnMouseClicked(lve -> {
                 String possibleOpponent = lv.getSelectionModel().getSelectedItem().toString();
-                ChallengePlayerDialog dialog = new ChallengePlayerDialog(app, possibleOpponent);
-                Optional<Pair<String, String>> result = dialog.display();
-                setLeftStatusText("Challenging player " + lv.getSelectionModel().getSelectedItem().toString());
-                result.ifPresent(command -> {
-                    setLeftStatusText("Challenged " + command.getKey() + " for a game of " + command.getValue());
-                    CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
-                });
+                if (!possibleOpponent.equals(app.getUser().getUsername())) {
+                    ChallengePlayerDialog dialog = new ChallengePlayerDialog(app, possibleOpponent);
+                    Optional<Pair<String, String>> result = dialog.display();
+                    setLeftStatusText("Challenging player " + lv.getSelectionModel().getSelectedItem().toString());
+                    result.ifPresent(command -> {
+                        setLeftStatusText("Challenged " + command.getKey() + " for a game of " + command.getValue());
+                        CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
+                    });
+                }
+                else{
+                    // For now, do nothing
+                }
             });
 
             grid.add(refreshBtn,0,1);

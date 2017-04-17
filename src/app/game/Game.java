@@ -124,7 +124,7 @@ public class Game {
     public void addPendingChallenge(Challenge challenge) {
         this.pendingChallenges.add(challenge);
         Platform.runLater(() -> {
-            AcceptDeclineAlert dialog = new AcceptDeclineAlert();
+            AcceptDeclineAlert dialog = new AcceptDeclineAlert(challenge);
             Optional<ButtonType> result = dialog.showAndWait();
             if (result.get() == ButtonType.OK) {
                 CommandSender.addCommand(new ChallengeAcceptCommand(challenge));
