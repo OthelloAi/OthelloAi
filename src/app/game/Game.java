@@ -36,7 +36,9 @@ public class Game {
     private Actor actor;
     private Match match = null;
     private App app;
+    private boolean yourTurn = false;
 
+    private boolean toUseAI = false;
 
     public Game(App app) {
         this.app = app;
@@ -45,8 +47,24 @@ public class Game {
         actor = new MiniMaxActor(this, board);
     }
 
+    public void setYourTurn(boolean yourTurn) {
+        this.yourTurn = yourTurn;
+    }
+
+    public boolean isYourTurn() {
+        return yourTurn;
+    }
+
     public void addGUI(GUI gui) {
         this.gui = gui;
+    }
+
+    public void useAI(boolean toUseAI) {
+        this.toUseAI = toUseAI;
+    }
+
+    public boolean usesAI() {
+        return toUseAI;
     }
 
     public Actor getActor() {
@@ -104,6 +122,8 @@ public class Game {
     }
     
     public Match endMatch(EndState endState) {
+
+        gui.setLeftStatusText("Match has ended.. Thanks for playing. " + endState.name());
         // TODO: 14/04/2017 add functionality for ending a game here
 //        match.stop();
         return match;
@@ -144,7 +164,7 @@ public class Game {
         if (isLoggedIn()) {
             if (match.canDoMove()) {
                 match.addMove(move);
-                board.addMove(move.getPosition(), match.getTokenByPlayer(move.getPlayer()));
+                board.addMove(move.getPosition(), match.getTokenByPlayer(move.getPlayer())); //move.getPlayer().getToken());// todo tijdelijke check..
                 update();
             }
         }
@@ -156,10 +176,27 @@ public class Game {
     
     public void forfeit() {
         match.forfeit();
+        match.stop(GameState.LOSS);
+        gui.setLeftStatusText("You have forfeited the match.");
         update();
     }
 
-    public void handleMove(Integer movePosition) {
+    public void handleMove(Move move) {
+        // If your move is valid
+        if(board.isValidMove(move, move.getPlayer().getToken())) {//match.getTokenByPlayer(move.getPlayer()))) {//move.getPlayer().getToken())) {
+            CommandSender.addCommand(new MoveCommand(move));
+            setYourTurn(false);
+            gui.setLeftStatusText("Nice one, valid move!");
+        } else { // If your move isn't valid
+            gui.setLeftStatusText("Invalid move!");
+            Platform.runLater(() -> {
+                Alert alert = new InvalidMoveAlert();
+                alert.showAndWait();
+            });
+        }
+    }
+
+    public void handleMove(int movePosition) {
         Move move = new Move(movePosition, app.getUser());
         // TODO: 16-4-2017 finish and implement
         // If it's not your turn
@@ -170,11 +207,13 @@ public class Game {
             });
         } **/
         // If your move is valid
-        if(board.isValidMove(move, match.getTokenByPlayer(move.getPlayer()))) {
+        if(board.isValidMove(move, move.getPlayer().getToken())) {//match.getTokenByPlayer(move.getPlayer()))) {
             CommandSender.addCommand(new MoveCommand(move));
             System.out.println("Nice one, valid move");
+            gui.setLeftStatusText("Nice one, valid move!");
         } else { // If your move isn't valid
             System.out.println("Invalid move!");
+            gui.setLeftStatusText("Invalid move!");
             Platform.runLater(() -> {
                 Alert alert = new InvalidMoveAlert();
                 alert.showAndWait();

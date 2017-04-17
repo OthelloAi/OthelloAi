@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
  */
 public class MiniMaxActor implements Actor {
 
-    private static final int DEPTH = 8;
+    private static final int DEPTH = 10;
     // weights
     private int[] weights = {
             120, -20, 20,  5,  5, 20, -20, 120,

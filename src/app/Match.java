@@ -70,10 +70,16 @@ public class Match {
     }
 
     public void start() {
+        if (playerOne == null || playerTwo == null) {
+            return;
+        }
+        gameState = GameState.CONTINUE;
         started = true;
     }
-    public void stop() {
-       forfeit();
+
+    public void stop(GameState gameState) {
+       this.gameState = gameState;
+       finished = true;
     }
 
     public void addGameState(GameState gameState) {
@@ -86,26 +92,29 @@ public class Match {
     }
 
     public void forfeit() {
+        stop(GameState.LOSS);
         forfeited = true;
     }
 
-    public boolean isForfeited() {
-        return forfeited;
-    }
-
     public boolean isStarted() {
-        return started;
+        return (gameState == GameState.CONTINUE);
     }
     public boolean isFinished() {
-        return finished;
+        return (gameState != GameState.CONTINUE);
+//        return finished;
     }
 
     public boolean canDoMove() {
-        if (!started || forfeited || finished) {
-            return false;
-        } else {
+        if (gameState == GameState.CONTINUE) {
             return true;
+        } else {
+            return false;
         }
+//        if (!started || forfeited || finished) {
+//            return false;
+//        } else {
+//            return true;
+//        }
     }
     public Token getTokenByPlayer(Player player) {
         if (player.getUsername().equals(getPlayerOne().getUsername())) {
