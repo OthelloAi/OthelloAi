@@ -20,7 +20,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import app.network.commands.*;
@@ -49,6 +49,7 @@ public class GUI extends BorderPane {
         this.app = app;
         this.game = app.getGame();
         game.addGUI(this);
+        gameGUI = new GameGUI(this);
         render();
     }
 
@@ -79,28 +80,46 @@ public class GUI extends BorderPane {
         Platform.runLater(() -> {
             createMenuBar();
             createStatusBar();
-            if (game.isLoggedIn()) {
-                if (game.getGameType() == GameType.REVERSI && !(gameGUI instanceof OthelloGUI) && game.isInMatch()) {
-                    gameGUI = new OthelloGUI(game.getBoard());
-                    this.boardLength = 8;
-                    setCenter(gameGUI);
-                }
-                if (game.getGameType() == GameType.TIC_TAC_TOE && !(gameGUI instanceof TicTacToeGUI) && game.isInMatch()) {
-                    gameGUI = new TicTacToeGUI(game.getBoard());
-                    this.boardLength = 3;
-                    setCenter(gameGUI);
-                }
-                if (gameGUI != null) {
-                    gameGUI.render();
-                    gameGUI.setOnMouseClicked(e -> handleMouseClick(e));
-                }
-            }
+            createCenter();
         });
+    }
+
+    private void createCenter() {
+        if (game.isLoggedIn()) {
+            if (game.getMatch() != null && game.getMatch().isStarted()) {
+                this.boardLength = game.getBoard().length;
+                VBox vBox = new VBox();
+                vBox.setAlignment(Pos.TOP_CENTER);
+                vBox.setSpacing(10);
+
+                Pane scorePane = new Pane();
+                scorePane.setPrefWidth(widthProperty().doubleValue());
+
+
+                String youMsg = "You " + game.getLoggedInPlayer().getToken() + " : " + game.getScore(game.getLoggedInPlayer());
+                String oppMsg = "Opponent " + game.getLoggedInPlayer().getOpponent().getToken() + " : " + game.getScore(game.getLoggedInPlayer().getOpponent());
+
+                Text scoreText = new Text(youMsg + " | " + oppMsg);
+                scorePane.getChildren().add(scoreText);
+
+                gameGUI = new GameGUI(game.getBoard(), this);
+                vBox.getChildren().addAll(scorePane, gameGUI);
+                gameGUI.setPrefSize(vBox.getWidth(), vBox.getHeight());
+                gameGUI.setBoard(game.getBoard());
+
+
+                vBox.setMargin(scorePane, new Insets(20, 10, 0, 10));
+                vBox.setMargin(gameGUI, new Insets(20, 20,  20, 20));
+                setCenter(vBox);
+//                setCenter(gameGUI);
+                gameGUI.render();
+            }
+        }
     }
 
     private void createStatusBar() {
         HBox hBox = new HBox();
-        hBox.getChildren().addAll(leftStatus);
+        hBox.getChildren().add(leftStatus);
         setBottom(hBox);
     }
 
@@ -276,19 +295,10 @@ public class GUI extends BorderPane {
         return item;
     }
 
-    private void handleMouseClick(MouseEvent e){
+    public void handleMouseClick(int x, int y){
         if (game.isYourTurn()) {
-            Double doubleX = e.getX();
-            Double doubleY = e.getY();
-            int intX = doubleX.intValue();
-            int intY = doubleY.intValue();
-            int posX = (intX / gameGUI.tileSize);
-            int posY = (intY / gameGUI.tileSize);
-            int position = (posY * this.boardLength) + posX;
-            if (posX < this.boardLength && posY < this.boardLength) {
-                Move move = new Move(position, game.getLoggedInPlayer());
-                game.handleMove(move);
-            }
+            Move move = new Move((y * boardLength + x), game.getLoggedInPlayer());
+            game.handleMove(move);
         }
     }
 

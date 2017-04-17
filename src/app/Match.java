@@ -102,18 +102,8 @@ public class Match {
         return (gameState != GameState.CONTINUE);
 //        return finished;
     }
-
     public boolean canDoMove() {
-        if (gameState == GameState.CONTINUE) {
-            return true;
-        } else {
-            return false;
-        }
-//        if (!started || forfeited || finished) {
-//            return false;
-//        } else {
-//            return true;
-//        }
+        return (gameState == GameState.CONTINUE); // todo duplicate functionality.. CLEAN UP
     }
     public Token getTokenByPlayer(Player player) {
         if (player.getUsername().equals(getPlayerOne().getUsername())) {
