@@ -28,13 +28,19 @@ public class AIMoveCommand implements Command {
         if (wait) {
             long start = System.currentTimeMillis();
             Thread t = new Thread(() -> {
+                boolean redoneStep = false;
                 while(true) {
                     long current = System.currentTimeMillis();
                     long diff = ((current - start) / 1);
 
+//                    if (diff >= 250) {
+//                        if (!redoneStep) {
+//                            game.redoLastMove();
+//                            redoneStep = true;
+//                        }
+//                    }
 //                    Debug.println(diff);
                     if (diff >= 500) {
-                        game.redoLastMove();
                         sendMoveLatch.countDown();
                         break;
                     }
@@ -46,9 +52,10 @@ public class AIMoveCommand implements Command {
             try {
                 sendMoveLatch.await();
 
-
-
                 int movePos = game.getActor().getNext(game.getPossibleMoves());
+//                if (game.moveAlreadyMade(movePos)) {
+//                    game.redoLastMove();
+//                }
                 System.out.println("SEND AI move " + movePos + " from player " + game.getLoggedInPlayer().getUsername() + " with token " + game.getLoggedInPlayer().getToken());
 
                 return "move " + movePos;

@@ -300,11 +300,11 @@ public class GUI extends BorderPane {
             choices.add("Tic-tac-toe");
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
             setLeftStatusText("Subscribing...");
-            game.useAI(false);
+//            game.useAI(false);
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(gameType -> {
                 setLeftStatusText("Subscribed to " + gameType + ". Waiting for opponent..");
-                game.useAI(true);
+//                game.useAI(true);
                 CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
             });
         });
@@ -322,14 +322,19 @@ public class GUI extends BorderPane {
         item.setOnAction(e -> {
             List<String> choices = new ArrayList<>();
             choices.add("MiniMax");
-//            choices.add("Iterative");
-//            choices.add("Random");
+            choices.add("Iterative");
+            choices.add("Random");
             choices.add("Human");
             ChooseActorDialog<String> dialog = new ChooseActorDialog<>("MiniMax", choices);
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(Actor -> {
                 setLeftStatusText("Actor: " + Actor);
                 game.setActorState(Actor);
+                if (!Actor.equals("Human")) {
+                    game.useAI(true);
+                } else {
+                    game.useAI(false);
+                }
             });
         });
         return item;
