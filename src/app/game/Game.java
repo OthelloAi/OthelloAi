@@ -29,7 +29,8 @@ public class Game {
     private GameType gameType;
     private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
-    private Stack<Pair<Integer, Board>> boardStates;
+    private ArrayList<Integer> movesMade;
+    private Stack<Pair<Move, Board>> boardStates;
     private ActorState actorState = ActorState.HUMAN;
     private Actor actor;
     private Match match = null;
@@ -41,6 +42,7 @@ public class Game {
     public Game(App app) {
         this.app = app;
         boardStates = new Stack<>();
+        movesMade = new ArrayList<>();
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
         actor = new MiniMaxActor(this, board);
@@ -79,6 +81,13 @@ public class Game {
     }
     public GameType getGameType() {
         return gameType;
+    }
+
+    public boolean moveAlreadyMade(int position) {
+        if (movesMade.contains(Integer.valueOf(position))) {
+            return true;
+        }
+        return false;
     }
 
     public void setGameType(GameType gameType) {
@@ -192,12 +201,14 @@ public class Game {
 
     public void sendAIMove() {
         if (!match.gameOver(board)) {
-            ArrayList<Integer> possibleMoves = getPossibleMoves();
-            if (possibleMoves.size() > 0) {
-                int position = actor.getNext(possibleMoves);
-                Move move = new Move(position, getLoggedInPlayer());
+            if (usesAI()) {
+                ArrayList<Integer> possibleMoves = getPossibleMoves();
+                if (possibleMoves.size() > 0) {
+//                int position = actor.getNext(possibleMoves);
+//                Move move = new Move(position, getLoggedInPlayer());
 ////            board.addMove(move.getPosition(), move.getPlayer().getToken());
-                CommandSender.addCommand(new AIMoveCommand(this));
+                    CommandSender.addCommand(new AIMoveCommand(this));
+                }
             }
         }
     }
@@ -210,12 +221,18 @@ public class Game {
         Pair boardState = boardStates.pop();
         System.out.println(boardState.getKey());
         System.out.println(boardState.getValue());
+        Board b = (Board)boardState.getValue();
+        Move move = (Move) boardState.getKey();
+        board.setBoard(b.getBoard());
+        board.addMove(move.getPosition(), move.getPlayer().getToken());
+        update();
     }
 
     public void processMove(Move move) {
         if (match != null) {
+            boardStates.push(new Pair(move, new Board(board)));
             match.addMove(move);
-//            boardStates.push(new Pair(move.getPosition(), new Board(board)));
+            movesMade.add(move.getPosition());
         }
         update();
     }
