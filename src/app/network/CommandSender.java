@@ -1,7 +1,6 @@
 package app.network;
 
 import app.App;
-import app.game.Game;
 import app.Protocol;
 import app.network.commands.Command;
 import app.network.commands.NullCommand;
@@ -17,6 +16,8 @@ import java.util.LinkedList;
 
 /**
  * @author Joël Hoekstra
+ * @author Gabe Witteveen
+ * @author Martijn Snijder
  */
 public class CommandSender implements Protocol, Runnable {
     private static ArrayList<Command> commands;
@@ -52,28 +53,20 @@ public class CommandSender implements Protocol, Runnable {
                         Command command = commands.get(0);
                         out.println(command.toString());
                         addSentCommand(command);
-                        Debug.println("[CLNT] command: " + command.toString());
                         commands.remove(0);
                     }
 
                     if (responses.size() > 0) {
                         Response response = responses.get(0);
                         response.handle();
-                        Debug.println("[CLNT] response handled");
                     }
                     Thread.sleep(10);
                 }
             }
 
         } catch (InterruptedException e) {
-//            e.printStackTrace();
         } catch (Exception e) {
-//            e.printStackTrace();
         }
-    }
-
-    public static void addResponse(Response response) {
-        responses.add(response);
     }
 
     public static void addCommand(Command command) {

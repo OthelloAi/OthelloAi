@@ -81,10 +81,7 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setTitle("Tic-Tac-Toe | Reversi client");
         stage.show();
-
-//        if (OS.indexOf("win") >= 0) {
-            stage.setResizable(false);
-//        }
+        stage.setResizable(false);
         stage.setOnCloseRequest(e -> {
             stop();
         });
@@ -94,10 +91,6 @@ public class App extends Application {
         stages.add(stage);
     }
 
-    public Game newGame() {
-        // TODO: 14/04/2017 create a new game object and update gui, etc with this.
-        return game;
-    }
     public Game getGame() {
         return game;
     }

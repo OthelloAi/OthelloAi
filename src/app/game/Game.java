@@ -27,7 +27,6 @@ public class Game {
     private GUI gui;
     private Board board;
     private GameType gameType;
-    private ArrayList<Player> playerList;
     private ArrayList<Challenge> pendingChallenges;
     private ArrayList<Integer> movesMade;
     private Stack<Pair<Move, Board>> boardStates;
@@ -45,6 +44,7 @@ public class Game {
         movesMade = new ArrayList<>();
         pendingChallenges = new ArrayList<>();
         board = new Board(gameType);
+        actorState = ActorState.MINIMAX;
         actor = new MiniMaxActor(this, board);
         Debug.println("I am debugging now <3");
     }
@@ -83,12 +83,6 @@ public class Game {
         return gameType;
     }
 
-    public boolean moveAlreadyMade(int position) {
-        if (movesMade.contains(Integer.valueOf(position))) {
-            return true;
-        }
-        return false;
-    }
 
     public void setGameType(GameType gameType) {
         this.gameType = gameType;
@@ -103,8 +97,6 @@ public class Game {
     public boolean isInMatch() {
         return (match != null && match.isStarted() && !match.isFinished());
     }
-
-    public ArrayList<Player> getPlayerList() {return playerList;}
 
     public int getScore(Player player) {
         int score = 0;
@@ -124,10 +116,6 @@ public class Game {
     }
     public Board getBoardObj() {
         return board;
-    }
-
-    public void setPlayers(ArrayList<Player> playerList) {
-        this.playerList = playerList;
     }
 
     public void addPendingChallenge(Challenge challenge) {
@@ -163,7 +151,6 @@ public class Game {
         }
     }
     public Match endMatch(GameState gameState) {
-
         gui.setLeftStatusText("Match has ended.. Thanks for playing. " + gameState.name());
         match.stop(gameState);
         return match;
@@ -174,6 +161,11 @@ public class Game {
     }
 
     public void startMatch(Player playerOne, Player playerTwo, GameType gameType) {
+        if (actorState == ActorState.HUMAN) {
+            useAI(false);
+        } else {
+            useAI(true);
+        }
         playerOne.setOpponent(playerTwo);
         playerTwo.setOpponent(playerOne);
 
@@ -204,28 +196,10 @@ public class Game {
             if (usesAI()) {
                 ArrayList<Integer> possibleMoves = getPossibleMoves();
                 if (possibleMoves.size() > 0) {
-//                int position = actor.getNext(possibleMoves);
-//                Move move = new Move(position, getLoggedInPlayer());
-////            board.addMove(move.getPosition(), move.getPlayer().getToken());
                     CommandSender.addCommand(new AIMoveCommand(this));
                 }
             }
         }
-    }
-
-
-    public void redoLastMove() {
-        if (boardStates.empty()) {
-            return;
-        }
-        Pair boardState = boardStates.pop();
-        System.out.println(boardState.getKey());
-        System.out.println(boardState.getValue());
-        Board b = (Board)boardState.getValue();
-        Move move = (Move) boardState.getKey();
-        board.setBoard(b.getBoard());
-        board.addMove(move.getPosition(), move.getPlayer().getToken());
-        update();
     }
 
     public void processMove(Move move) {
@@ -259,26 +233,28 @@ public class Game {
         }
     }
 
-    // TODO: 16/04/2017 MOVED TO BOARD but here for backwards compatibility.. DEPRECATED.
     public ArrayList<Integer> getPossibleMoves() {
         return board.getPossibleMoves(app.getUser());
     }
 
+    // help = hints
     public void showHelp() {
         removeHelp();
-        if (isYourTurn()) {
+        if (isYourTurn() && !usesAI()) {
             for (int pos : getPossibleMoves()) {
                 int posY = pos / getBoard().length;
                 int posX = pos % getBoard().length;
                 if (pos == actor.getNext(getPossibleMoves())) {
                     getBoard()[posY][posX] = new Token(TokenState.BEST);
                 } else {
-                    getBoard()[posY][posX] = new Token(TokenState.POSSIBLE);//.setTokenState(TokenState.POSSIBLE);
+                    getBoard()[posY][posX] = new Token(TokenState.POSSIBLE);
                 }
             }
         }
+        update();
     }
 
+    // help = hints
     public void removeHelp() {
         for (int y = 0; y < getBoard().length; y++) {
              for (int x = 0; x < getBoard().length; x++) {
@@ -287,6 +263,7 @@ public class Game {
                  }
              }
         }
+        update();
     }
 
     public void update() {

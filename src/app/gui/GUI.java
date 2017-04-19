@@ -115,7 +115,6 @@ public class GUI extends BorderPane {
                 vBox.setMargin(scorePane, new Insets(20, 10, 0, 10));
                 vBox.setMargin(gameGUI, new Insets(20, 20,  20, 20));
                 setCenter(vBox);
-//                setCenter(gameGUI);
                 game.showHelp();
                 gameGUI.render();
             }
@@ -213,9 +212,6 @@ public class GUI extends BorderPane {
                         CommandSender.addCommand(new ChallengeCommand(command.getKey(), Config.getGameTypeFromName(command.getValue())));
                     });
                 }
-                else{
-                    // For now, do nothing
-                }
             });
 
             grid.add(refreshBtn,0,1);
@@ -300,11 +296,9 @@ public class GUI extends BorderPane {
             choices.add("Tic-tac-toe");
             SubscribeDialog<String> dialog = new SubscribeDialog<>("Reversi", choices);
             setLeftStatusText("Subscribing...");
-//            game.useAI(false);
             Optional<String> result = dialog.showAndWait();
             result.ifPresent(gameType -> {
                 setLeftStatusText("Subscribed to " + gameType + ". Waiting for opponent..");
-//                game.useAI(true);
                 CommandSender.addCommand(new SubscribeCommand(Config.getGameTypeFromName(gameType)));
             });
         });
@@ -353,7 +347,6 @@ public class GUI extends BorderPane {
     }
 
     public void update() {
-        // grab everything if something has changed
         render();
     }
 }

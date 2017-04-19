@@ -3,7 +3,6 @@ package app;
 import app.game.GameType;
 import app.game.Move;
 import app.game.Player;
-import app.utils.Debug;
 
 import java.util.*;
 
@@ -14,8 +13,6 @@ import java.util.*;
 public class Board {
     private Token[][] board = null;
     private GameType gameType;
-
-    private boolean finishedFlipping = false;
 
     public Board(GameType gameType) {
         this.gameType = gameType;
@@ -29,24 +26,8 @@ public class Board {
     public Board(GameType gameType, Token[][] board) {
         this.gameType = gameType;
         this.board = deepCopy(board);
-//        print();
     }
 
-    public void print() {
-        return;
-//        if (board == null) {
-//            Debug.println("BOARD IS NULL");
-//            return;
-//        }
-//        Debug.println();
-//        for (int y = 0; y < board.length; y++) {
-//            for (int x = 0; x < board.length; x++) {
-//                Debug.print(" " + board[y][x]);
-//            }
-//            Debug.println();
-//        }
-//        Debug.println();
-    }
     public GameType getGameType() {
         return gameType;
     }
@@ -146,11 +127,6 @@ public class Board {
         return true;
     }
 
-    public void clear() {
-        board = null;
-        finishedFlipping = false;
-        generateBoard();
-    }
 
     public Token[][] getBoard() {
         return board;
@@ -167,17 +143,9 @@ public class Board {
         board[y][x] = token;
 
         if (gameType == GameType.REVERSI) {
-            setFinishedFlipping(flipColors(position, token));
+            flipColors(position, token);
         }
         return this;
-    }
-
-    public void setFinishedFlipping(boolean finishedFlipping) {
-        this.finishedFlipping = finishedFlipping;
-    }
-
-    public boolean getFinishedFlipping() {
-        return finishedFlipping;
     }
 
     public ArrayList<Integer> getPossibleMoves(Player player) {
@@ -186,7 +154,6 @@ public class Board {
             for (int x = 0; x < board.length; x++) {
                 int position = y * board.length + x;
                 Move move = new Move(position, player);
-//                Debug.println("player -> " + player.getUsername() + " with token -> " + player.getToken());
                 if (isValidMove(move, player.getToken())) {
                     possibleMoves.add(move.getPosition());
                 }
@@ -204,9 +171,5 @@ public class Board {
             result[r] = input[r].clone();
         }
         return result;
-    }
-
-    public Token getTokenOnPosition(int position) {
-        return board[position / board.length][position % board.length];
     }
 }

@@ -3,40 +3,29 @@ package app.actors;
 import app.*;
 import app.exceptions.NotARealMoveException;
 import app.game.Game;
-import app.game.Move;
+import app.game.GameType;
 import app.game.Player;
-import app.utils.Debug;
 
 import java.util.*;
 import java.util.stream.IntStream;
 
 /**
+ * ONLY WORKS FOR REVERSI!!
  * @author Joël Hoekstra
  */
 public class MiniMaxActor implements Actor {
 
-    private static final int DEPTH = 10;
-    // weights
-    private int[] weights2 = {
-            120, -20, 20,  5,  5, 20, -20, 120,
-            -20, -40, -5, -5, -5, -5, -40, -20,
-             20,  -5, 15,  3,  3, 15,  -5,  20,
-              5,  -5,  3,  3,  3,  3,  -5,   5,
-              5,  -5,  3,  3,  3,  3,  -5,   5,
-             20,  -5, 15,  3,  3,  3,  -5,  20,
-            -20, -40, -5, -5, -5, -5, -40, -20,
-            120, -20, 20,  5,  5, 20, -20, 120,
-    };
+    private static final int DEPTH = 3;
 
     private int[] weights = {
-            8, 2, 7, 6, 6, 7, 2, 8,
-            2, 1, 3, 3, 3, 3, 1, 2,
-            7, 3, 5, 4, 4, 5, 3, 7,
-            6, 3, 4, 0, 0, 4, 3, 6,
-            6, 3, 4, 0, 0, 4, 3, 6,
-            7, 3, 5, 4, 4, 5, 3, 7,
-            2, 1, 3, 3, 3, 3, 1, 2,
-            8, 2, 7, 6, 6, 7, 2, 8
+            120, -20, 20,  5,  5, 20, -20, 120,
+            -20, -40, -5, -5, -5, -5, -40, -20,
+            20,  -5, 15,  3,  3, 15,  -5,  20,
+            5,  -5,  3,  3,  3,  3,  -5,   5,
+            5,  -5,  3,  3,  3,  3,  -5,   5,
+            20,  -5, 15,  3,  3,  3,  -5,  20,
+            -20, -40, -5, -5, -5, -5, -40, -20,
+            120, -20, 20,  5,  5, 20, -20, 120,
     };
 
     private Player player;
@@ -52,49 +41,68 @@ public class MiniMaxActor implements Actor {
     @Override
     public int getNext(ArrayList<Integer> possibleMoves) {
         int nextPossibleMove = possibleMoves.get(0);
+
+        if (game.getGameType() == GameType.TIC_TAC_TOE) {
+            return nextPossibleMove;
+        }
+
         this.board = game.getBoardObj();
         this.player = game.getLoggedInPlayer();
-        board.print();
         Board b = new Board(game.getBoardObj());
         int move;
         try {
             move = getMove(player, b);
             nextPossibleMove = move;
+
+            // check if the ai can grab a corner and if so DO IT!
+            for (int i = 0; i < possibleMoves.size(); i++) {
+                if (possibleMoves.get(i) == 0) {
+                    return possibleMoves.get(i);
+                }
+                if (possibleMoves.get(i) == 7) {
+                    return possibleMoves.get(i);
+                }
+                if (possibleMoves.get(i) == 56) {
+                    return possibleMoves.get(i);
+                }
+                if (possibleMoves.get(i) == 63) {
+                    return possibleMoves.get(i);
+                }
+            }
         } catch (NotARealMoveException e) {
             e.printStackTrace();
         }
         return nextPossibleMove;
     }
 
+    // recursive negamax method
     public int negamax(Player player, Board b, int depth) {
-        if (depth == 0) {
+        if (depth == 0) {   // if final depth is reached calculate the weighted score of the board
             return weightedScore(player, b.getBoard());
         }
 
         ArrayList<Integer> moves = b.getPossibleMoves(player);
 
-        if (moves.size() == 0) {
-            if (b.getPossibleMoves(player.getOpponent()).size() > 0) {
-                return finalValue(player, b.getBoard());
+        if (moves.size() == 0) {    // if there are moves left for the player
+            if (b.getPossibleMoves(player.getOpponent()).size() > 0) { // check if there are possible moves for the opponent
+                return finalValue(player, b.getBoard()); // when there are moves left check the final value
             }
-            return -negamax(player, b,depth - 1);
+            return -negamax(player, b,depth - 1); // reverse the negamax and go deeper
         }
 
         int[] values = new int[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
-            values[i] = valueBoard(player, b.addMove(moves.get(i), player.getToken()), depth);
+            // get values from a level deeper and from the opponent
+            values[i] = -negamax(player.getOpponent(), b.addMove(moves.get(i), player.getToken()), depth - 1);
         }
-
+        // get max valued move number
         int max = getMax(values);
 
+        // return max move
         return moves.get(max);
     }
 
-    // helper method for negamax
-    private int valueBoard(Player player, Board b, int depth) {
-        return -negamax(player.getOpponent(), b, depth - 1);
-    }
-
+    // gets the maximum value by sum of the weights
     private int getMaxValue() {
         int[] absWeights = new int[board.getBoard().length];
         for (int i = 0; i < board.getBoard().length; i++) {
@@ -102,26 +110,20 @@ public class MiniMaxActor implements Actor {
         }
 
         int sum = IntStream.of(weights).sum(); // http://stackoverflow.com/a/17846520
-//        Debug.println("getMaxValue: " + sum);
         return sum;
     }
 
-    private int getMinValue() {
-        int minValue = -getMaxValue();
-//        Debug.println("getMinValue: " + minValue);
-        return minValue;
-    }
-
+    // gets the max scoring move from the possible moves
     private int maxScore(Player player, Board b) {
         ArrayList<Integer> moves = b.getPossibleMoves(player);
-        int[] scores = new int[moves.size()];
-//        Debug.println("SCORES: ");
+        int[] scores = new int[moves.size()]; // list with scores
         for (int i = 0; i < moves.size(); i++) {
+            // add the score from the given move to the list
             scores[i] = scoreMove(player, b.addMove(i, player.getToken()));
-//            Debug.println("move " + moves.get(i) + " - i: " + i + " score: " + scores[i]);
         }
-
+        // get max score from all moves
         int max = getMax(scores);
+        // get the value associated to the max value
         return moves.get(max);
     }
 
@@ -149,16 +151,20 @@ public class MiniMaxActor implements Actor {
         return negamax(player, b, DEPTH);
     }
 
+    // calculates the score for the player based upon the difference created in the score method.
+    // if the score is below zero return minvalue and higher return maxvalue else return the score
     private int finalValue(Player player, Token[][] b) {
         int diff = score(player, b);
         if (diff < 0) {
-            return getMinValue();
+            return -getMaxValue();
         } else if (diff > 0) {
             return getMaxValue();
         }
         return diff;
     }
 
+    // calculate the amount of nodes on the field associated with both players and subtract the opponents
+    // score from mine.
     private int score(Player player, Token[][] b) {
         int mine = 0;
         int theirs = 0;
@@ -174,7 +180,6 @@ public class MiniMaxActor implements Actor {
                 }
             }
         }
-
         return mine - theirs;
     }
 
@@ -191,130 +196,5 @@ public class MiniMaxActor implements Actor {
             }
         }
         return total;
-    }
-
-//    public Move chooseMove(Player player) {
-//        ArrayList<Integer> possibleMoves = board.getPossibleMoves(player);
-//        Map<Move, ArrayList<>>
-//    }
-
-    public int getHeuristic(Board b, Move move) {
-        Player player = move.getPlayer();
-        int heuristic = 0;
-
-        ArrayList<Integer> possibleMoves = b.getPossibleMoves(player);
-
-        for (Integer position : possibleMoves) {
-            heuristic += getHeuristicFromPosition(position, player.getToken(), b);
-        }
-
-        return heuristic;
-    }
-
-    public int getHeuristicFromPosition(int position, Token token, Board b) {
-        int heuristic = 0;
-        switch(position) {
-            case 0:
-            case 7:
-            case 56:
-            case 63:
-                if (b.getTokenOnPosition(position) == token) {
-                    heuristic = 50;
-                    break;
-                }
-            case 3:
-            case 4:
-            case 18:
-            case 21:
-            case 24:
-            case 31:
-            case 32:
-            case 39:
-            case 42:
-            case 45:
-            case 59:
-            case 60:
-                if (b.getTokenOnPosition(position) == token) {
-                    heuristic = 10;
-                }
-                break;
-            case 10:
-            case 11:
-            case 12:
-            case 13:
-            case 17:
-            case 22:
-            case 25:
-            case 27:
-            case 28:
-            case 30:
-            case 33:
-            case 35:
-            case 36:
-            case 38:
-            case 41:
-            case 46:
-            case 50:
-            case 51:
-            case 52:
-            case 53:
-                if (b.getTokenOnPosition(position) == token) {
-                    heuristic = -10;
-                }
-                break;
-            case 19:
-            case 20:
-            case 26:
-            case 29:
-            case 34:
-            case 37:
-            case 43:
-            case 44:
-                if (b.getTokenOnPosition(position) == token) {
-                    heuristic = -50;
-                }
-                break;
-            case 1:
-            case 8:
-            case 9:
-                if (b.getTokenOnPosition(position) == token) {
-                    if (b.getTokenOnPosition(0) == token) {
-                        heuristic = 75;
-                    } else {
-                        heuristic = -75;
-                    }
-                }
-                break;
-            case 6:
-            case 14:
-            case 15:
-                if (b.getTokenOnPosition(position) == token) {
-                    if (b.getTokenOnPosition(7) == token) {
-                        heuristic = 75;
-                    } else {
-                        heuristic = -75;
-                    }
-                }
-                break;
-            case 48:
-            case 49:
-            case 57:
-                if (b.getTokenOnPosition(position) == token)
-                    if (b.getTokenOnPosition(56) == token)
-                        heuristic = 75;
-                    else
-                        heuristic = -75;
-                break;
-            case 54:
-            case 55:
-            case 62:
-                if (b.getTokenOnPosition(position) == token)
-                    if (b.getTokenOnPosition(63) == token)
-                        heuristic = 75;
-                    else
-                        heuristic = -75;
-                break;
-        }
-        return heuristic;
     }
 }
