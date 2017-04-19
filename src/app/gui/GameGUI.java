@@ -32,13 +32,11 @@ public class GameGUI extends GridPane {
 
     public void addConstraints() {
         for (int x = 0; x < board.length; x++) {
-//            RowConstraints r = new RowConstraints();
             row.setVgrow(Priority.ALWAYS);
             getRowConstraints().add(row);
         }
 
         for (int y = 0; y < board.length; y++) {
-//            ColumnConstraints c = new ColumnConstraints();
             col.setHgrow(Priority.ALWAYS);
             getColumnConstraints().add(col);
         }

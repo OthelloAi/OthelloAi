@@ -5,7 +5,6 @@ import app.Challenge;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 
 /**
  * Created by Robert on 11-4-2017.

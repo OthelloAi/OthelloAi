@@ -7,7 +7,6 @@ import javafx.scene.control.Alert;
  */
 public class YouWonAlert extends Alert {
      public YouWonAlert(){
-        // TODO: 7-4-2017 Add player name, score and reason for win
         super(AlertType.INFORMATION);
         setTitle("Winners message");
         setHeaderText("Congratulations, you won the game!");

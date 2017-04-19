@@ -24,9 +24,6 @@ public class GameDrawResponse implements Response {
     @Override
     public void handle() {
         app.getGame().endMatch(GameState.DRAW);
-//        PLAYERONESCORE
-        // PLAYERTWOSCORE
-        // COMMENT
         Platform.runLater(() -> {
             Alert alert = new DrawGameAlert();
             alert.showAndWait();
