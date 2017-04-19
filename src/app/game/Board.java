@@ -1,8 +1,7 @@
-package app;
+package app.game;
 
-import app.game.GameType;
-import app.game.Move;
-import app.game.Player;
+import app.utils.Token;
+import app.utils.TokenState;
 
 import java.util.*;
 

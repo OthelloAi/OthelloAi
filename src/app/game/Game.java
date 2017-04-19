@@ -6,9 +6,12 @@ import app.actors.IterativeActor;
 import app.actors.MiniMaxActor;
 import app.actors.RandomActor;
 import app.gui.alerts.*;
+import app.network.Challenge;
 import app.network.CommandSender;
 import app.utils.ActorState;
 import app.utils.Debug;
+import app.utils.Token;
+import app.utils.TokenState;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -17,8 +20,6 @@ import app.gui.GUI;
 import javafx.util.Pair;
 
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Joël Hoekstra

@@ -1,6 +1,5 @@
 package app.network;
 
-import app.Protocol;
 import app.utils.Debug;
 
 import java.io.IOException;

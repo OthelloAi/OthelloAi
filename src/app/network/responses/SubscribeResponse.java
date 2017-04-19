@@ -1,8 +1,7 @@
 package app.network.responses;
 
 import app.App;
-import app.game.Game;
-import app.Subscribe;
+import app.network.Subscribe;
 
 /**
  * @author Joël Hoekstra

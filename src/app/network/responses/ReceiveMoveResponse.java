@@ -1,17 +1,12 @@
 package app.network.responses;
 
 import app.App;
-import app.Token;
-import app.game.Game;
 import app.game.Move;
 import app.game.Player;
 import app.utils.Debug;
-import javafx.application.Platform;
-import javafx.concurrent.Task;
 
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Joël Hoekstra

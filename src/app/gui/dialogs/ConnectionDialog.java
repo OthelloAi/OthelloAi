@@ -1,6 +1,6 @@
 package app.gui.dialogs;
 
-import app.Protocol;
+import app.network.Protocol;
 import javafx.scene.control.TextInputDialog;
 
 /**

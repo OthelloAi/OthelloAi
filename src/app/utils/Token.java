@@ -1,4 +1,4 @@
-package app;
+package app.utils;
 
 /**
  * @author Joël Hoekstra

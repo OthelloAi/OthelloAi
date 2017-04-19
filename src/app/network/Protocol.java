@@ -1,4 +1,4 @@
-package app;
+package app.network;
 
 /**
  * @author Joël Hoekstra

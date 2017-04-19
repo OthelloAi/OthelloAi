@@ -1,11 +1,9 @@
 package app.network;
 
 import app.App;
-import app.Protocol;
 import app.network.commands.Command;
 import app.network.commands.NullCommand;
 import app.network.responses.Response;
-import app.utils.Debug;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
