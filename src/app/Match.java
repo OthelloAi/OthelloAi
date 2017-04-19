@@ -1,7 +1,6 @@
 package app;
 
 import app.game.*;
-import app.utils.Debug;
 
 import java.util.ArrayList;
 
@@ -14,13 +13,6 @@ public class Match {
     private GameType gameType;
     private Player playerOne;
     private Player playerTwo;
-    private Player winner;
-    private Player activePlayer;
-    private Player initialPlayer;
-
-    private boolean started = false;
-    private boolean finished = false;
-    private boolean forfeited = false;
 
     private GameState gameState;
 
@@ -40,25 +32,15 @@ public class Match {
         playerTwo.setOpponent(playerOne);
         addPlayerTwo(playerTwo);
         playerTwo.setToken(getTokenByPlayer(playerTwo));
-
-        initialPlayer = playerOne;
-    }
-
-    private void printMovesList() {
-        for (Move move : moves) {
-            Debug.print(move.getPosition() + ", ");
-        }
-        Debug.println();
     }
 
     private void processMove(Move move) {
         moves.add(move);
-//        printMovesList();
         Player player = move.getPlayer();
         Board b = new Board(game.getBoardObj()); // clone board
         b.addMove(move.getPosition(), player.getToken()); // add move to cloned board
         boardStates.add(b);
-        game.getBoardObj().setBoard(b.deepCopy(b.getBoard()));//.addMove(move.getPosition(), player.getToken());
+        game.getBoardObj().setBoard(b.deepCopy(b.getBoard()));
         game.update();
     }
 
@@ -66,10 +48,6 @@ public class Match {
         if (gameState == GameState.LOSS || gameState == GameState.DRAW || gameState == GameState.WIN) {
             return true;
         }
-//        if (b.getPossibleMoves(playerOne).size() == 0 && b.getPossibleMoves(playerTwo).size() > 0) {
-//            Debug.println("BOTH PLAYERS HAVE NO MOVES LEFT");
-//            return true;
-//        }
         return false;
     }
 
@@ -97,27 +75,16 @@ public class Match {
         if (playerOne == null || playerTwo == null) {
             return;
         }
-        activePlayer = playerOne;
         gameState = GameState.CONTINUE;
     }
 
     public void stop(GameState gameState) {
        this.gameState = gameState;
-       finished = true;
     }
 
-    public void addGameState(GameState gameState) {
-        this.gameState = gameState;
-        if (gameState == GameState.DRAW ||
-                gameState == GameState.LOSS ||
-                gameState == GameState.WIN) {
-            finished = true;
-        }
-    }
 
     public void forfeit() {
         stop(GameState.LOSS);
-        forfeited = true;
     }
 
     public boolean isStarted() {
@@ -125,11 +92,8 @@ public class Match {
     }
     public boolean isFinished() {
         return (gameState != GameState.CONTINUE);
-//        return finished;
     }
-    public boolean canDoMove() {
-        return (gameState == GameState.CONTINUE); // todo duplicate functionality.. CLEAN UP
-    }
+
 
     public Token getTokenByPlayer(Player player) {
         if (player.getUsername().equals(getPlayerOne().getUsername())) {

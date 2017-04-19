@@ -1,7 +1,6 @@
 package app.network;
 
 import app.*;
-import app.game.Game;
 import app.game.GameType;
 import app.game.Player;
 import app.network.commands.Command;
@@ -122,7 +121,6 @@ public class InputHandler implements Runnable {
             try {
                 if ((responseString = reader.readLine()) != null) {
                     response = parseResponse(responseString);
-//                    Debug.println(response);
                     if (response != null) {
                         response.handle();
                     }
@@ -141,7 +139,6 @@ public class InputHandler implements Runnable {
         Matcher m = p.matcher(params);
         while (m.find()) {
             String group = m.group(1);
-//            Debug.println("ParseParams -> group: " + group);
             list.add(group);
         }
         return list;
@@ -153,7 +150,6 @@ public class InputHandler implements Runnable {
         for (int i = 0; i < explodedParams.length; i++) {
             String[] keyValue = explodedParams[i].split(": ");
             String key = keyValue[0];
-//            Debug.println("keyValue[1]: " + keyValue[1]);
             String value = keyValue[1].substring(1, keyValue[1].length() - 1);
             map.put(key, value);
         }

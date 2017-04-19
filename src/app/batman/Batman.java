@@ -1,7 +1,5 @@
 package app.batman;
 
-import app.utils.Debug;
-
 /**
  *
  * Every project needs it's hero.
@@ -18,9 +16,7 @@ import app.utils.Debug;
  */
 public final class Batman {
 
-    public Batman() {
-        Debug.println(toString());
-    }
+    public Batman() {}
     @Override
     public String toString() {
         String batman = "\n" +
