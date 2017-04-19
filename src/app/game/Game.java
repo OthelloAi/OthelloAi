@@ -35,7 +35,7 @@ public class Game {
     private Match match = null;
     private App app;
     private boolean yourTurn = false;
-
+    private boolean showingHelp = false;
     private boolean toUseAI = false;
 
     public Game(App app) {
@@ -237,10 +237,26 @@ public class Game {
         return board.getPossibleMoves(app.getUser());
     }
 
+
+    public void setShowingHelp(boolean showingHelp) {
+        this.showingHelp = showingHelp;
+    }
+    public boolean getShowingHelp() {
+        return showingHelp;
+    }
+
     // help = hints
     public void showHelp() {
-        removeHelp();
-        if (isYourTurn() && !usesAI()) {
+        if (match != null) {
+            for (int y = 0; y < getBoard().length; y++) {
+                for (int x = 0; x < getBoard().length; x++) {
+                    if (getBoard()[y][x].getState() == TokenState.POSSIBLE || getBoard()[y][x].getState() == TokenState.BEST) {
+                        getBoard()[y][x] = new Token(TokenState.EMPTY);
+                    }
+                }
+            }
+        }
+        if (isYourTurn() && !usesAI() && showingHelp) {
             for (int pos : getPossibleMoves()) {
                 int posY = pos / getBoard().length;
                 int posX = pos % getBoard().length;
@@ -251,19 +267,6 @@ public class Game {
                 }
             }
         }
-        update();
-    }
-
-    // help = hints
-    public void removeHelp() {
-        for (int y = 0; y < getBoard().length; y++) {
-             for (int x = 0; x < getBoard().length; x++) {
-                 if (getBoard()[y][x].getState() == TokenState.POSSIBLE || getBoard()[y][x].getState() == TokenState.BEST) {
-                     getBoard()[y][x] = new Token(TokenState.EMPTY);
-                 }
-             }
-        }
-        update();
     }
 
     public void update() {

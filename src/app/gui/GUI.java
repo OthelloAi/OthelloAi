@@ -259,17 +259,18 @@ public class GUI extends BorderPane {
     public MenuItem menuItemHelp(){
         final MenuItem item = new MenuItem("Help");
         item.setOnAction(e -> {
-            Debug.println(ifShowHelp);
-            if(ifShowHelp){
-                Debug.println(ifShowHelp);
-                ifShowHelp = false;
-                game.removeHelp();
-
-            }
-            else {
-                ifShowHelp = true;
-                game.showHelp();
-            }
+            game.setShowingHelp(!game.getShowingHelp());
+            game.update();
+//            if(ifShowHelp){
+//                Debug.println(ifShowHelp);
+//                ifShowHelp = false;
+//                game.removeHelp();
+//
+//            }
+//            else {
+//                ifShowHelp = true;
+//                game.showHelp();
+//            }
         });
         return item;
     }
