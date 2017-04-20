@@ -11,7 +11,6 @@ import app.game.Player;
 import app.gui.dialogs.*;
 import app.network.CommandSender;
 import app.utils.Config;
-import app.utils.Debug;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -259,16 +258,6 @@ public class GUI extends BorderPane {
         item.setOnAction(e -> {
             game.setShowingHelp(!game.getShowingHelp());
             game.update();
-//            if(ifShowHelp){
-//                Debug.println(ifShowHelp);
-//                ifShowHelp = false;
-//                game.removeHelp();
-//
-//            }
-//            else {
-//                ifShowHelp = true;
-//                game.showHelp();
-//            }
         });
         return item;
     }
