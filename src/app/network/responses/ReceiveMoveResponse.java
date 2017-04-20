@@ -33,9 +33,6 @@ public class ReceiveMoveResponse implements Response {
 
     @Override
     public void handle() {
-        // PLAYER
-        // MOVE
-        // DETAILS
         if (!params.get("DETAILS").equals("Illegal move")) {
             Player player;
             if (app.getGame().getMatch().getPlayerTwo().getUsername().equals(params.get("PLAYER"))) {

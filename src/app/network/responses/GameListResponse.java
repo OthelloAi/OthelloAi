@@ -15,10 +15,5 @@ public class GameListResponse implements Response {
 
     @Override
     public void handle() {
-        // do nothing
-//        System.out.println("processing GameListResponse");
-//        for (String game : gameList) {
-//            System.out.println(game);
-//        }
     }
 }

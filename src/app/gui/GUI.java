@@ -46,8 +46,6 @@ public class GUI extends BorderPane {
 
     private int boardLength;
 
-    public boolean ifShowHelp = false;
-
     public GUI(App app) {
         this.app = app;
         this.game = app.getGame();

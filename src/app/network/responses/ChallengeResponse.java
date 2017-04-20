@@ -30,10 +30,7 @@ public class ChallengeResponse implements Response {
     
     @Override
     public void handle() {
-//        Challenge challenge = new Challenge(params.get("CHALLENGER"), Config.getGameTypeFromName(params.get("GAMETYPE")));
-//        challenge.setId(Integer.parseInt(params.get("CHALLENGENUMBER")));
         app.getGame().addPendingChallenge(challenge);
-        // TODO: 14/04/2017 how can this be improved?
         Debug.println("challenge has been send");
     }
 }
