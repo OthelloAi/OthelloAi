@@ -1,10 +1,11 @@
 package app.actors;
 
-import app.*;
 import app.exceptions.NotARealMoveException;
+import app.game.Board;
 import app.game.Game;
 import app.game.GameType;
 import app.game.Player;
+import app.utils.Token;
 
 import java.util.*;
 import java.util.stream.IntStream;

@@ -1,7 +1,7 @@
 package app.gui.alerts;
 
 
-import app.Challenge;
+import app.network.Challenge;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;

@@ -1,6 +1,7 @@
-package app;
+package app.game;
 
-import app.game.*;
+import app.utils.Token;
+import app.utils.TokenState;
 
 import java.util.ArrayList;
 

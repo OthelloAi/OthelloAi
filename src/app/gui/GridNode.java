@@ -2,7 +2,7 @@ package app.gui;
 
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import app.Token;
+import app.utils.Token;
 
 /**
  * @author Joël Hoekstra

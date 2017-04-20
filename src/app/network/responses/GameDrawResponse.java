@@ -1,7 +1,6 @@
 package app.network.responses;
 
 import app.App;
-import app.Match;
 import app.game.GameState;
 import app.gui.alerts.DrawGameAlert;
 import javafx.application.Platform;

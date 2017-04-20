@@ -1,6 +1,6 @@
 package app.game;
 
-import app.Token;
+import app.utils.Token;
 
 /**
  * @author Joël Hoekstra

@@ -1,4 +1,4 @@
-package app;
+package app.network;
 
 import app.game.GameType;
 

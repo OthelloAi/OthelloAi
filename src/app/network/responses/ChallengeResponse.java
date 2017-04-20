@@ -1,10 +1,8 @@
 package app.network.responses;
 
 import app.App;
-import app.Challenge;
-import app.game.GameType;
+import app.network.Challenge;
 import app.utils.Config;
-import app.game.Game;
 import app.utils.Debug;
 
 import java.util.Map;

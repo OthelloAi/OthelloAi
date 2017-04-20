@@ -2,7 +2,7 @@ package app.gui;
 
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
-import app.Token;
+import app.utils.Token;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 

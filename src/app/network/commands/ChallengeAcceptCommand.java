@@ -1,6 +1,6 @@
 package app.network.commands;
 
-import app.Challenge;
+import app.network.Challenge;
 
 /**
  * @author js
